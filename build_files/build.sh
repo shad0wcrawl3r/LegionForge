@@ -15,6 +15,17 @@ cp -avf "/ctx/system_files"/. /
 # this installs a package from fedora repos
 dnf5 install -y tmux
 
+# niri (scrollable tiling Wayland compositor) + Noctalia shell, all from the
+# official Fedora repos, so no COPRs to maintain. Dotfiles are user-provided.
+#  - xwayland-satellite: X11 app support under niri
+#  - xdg-desktop-portal-gnome/gtk: portals niri uses for screencast & file pickers
+dnf5 install -y \
+    niri \
+    noctalia \
+    xwayland-satellite \
+    xdg-desktop-portal-gnome \
+    xdg-desktop-portal-gtk
+
 # Use a COPR Example:
 #
 # dnf5 -y copr enable ublue-os/staging
