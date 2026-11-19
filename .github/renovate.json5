@@ -6,6 +6,9 @@
 
   "rebaseWhen": "never",
 
+  // PR titles must follow Conventional Commits (enforced by pr-title.yml)
+  "semanticCommits": "enabled",
+
   "packageRules": [
     {
       "automerge": true,
