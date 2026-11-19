@@ -26,6 +26,14 @@ dnf5 install -y \
     xdg-desktop-portal-gnome \
     xdg-desktop-portal-gtk
 
+# Make Steam's "Switch to Desktop" open niri (see /usr/lib/os-session-select).
+chmod 0755 /usr/lib/os-session-select
+# steamos-manager's default desktop for direct steamosctl calls. Fail the
+# build if Bazzite changes this file, rather than silently keeping GNOME.
+sed -i 's/^desktop = "gnome.desktop"$/desktop = "niri.desktop"/' \
+    /usr/share/steamos-manager/platform.toml
+grep -qx 'desktop = "niri.desktop"' /usr/share/steamos-manager/platform.toml
+
 # Use a COPR Example:
 #
 # dnf5 -y copr enable ublue-os/staging
