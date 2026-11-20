@@ -78,6 +78,12 @@ check "ujust parses and has the LegionForge recipes" \
 check "no GNOME-only ujust recipes left" \
   "! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -qE 'restore-gnome-(de-settings|folders)' && ! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --show restore-virtual-keyboard | grep -q gnome-extensions"
 
+echo "== Boot animation"
+check "Legix Plymouth theme installed and set as default" \
+  "rpm -q plymouth-plugin-script && grep -qx 'Theme=legix' /etc/plymouth/plymouthd.conf && for f in legix.plymouth legix.script l-left.png l-right.png v.png gem.png gem-glow.png wordmark.png bar.png bar-bg.png; do test -s /usr/share/plymouth/themes/legix/\$f || exit 1; done"
+check "initramfs carries the Legix theme, the script plugin and ostree" \
+  "i=\$(ls /usr/lib/modules/*/initramfs.img) && l=\$(lsinitrd \"\$i\") && grep -q 'plymouth/themes/legix/legix.script' <<< \"\$l\" && grep -q 'plymouth/script.so' <<< \"\$l\" && grep -q 'ostree-prepare-root' <<< \"\$l\""
+
 echo "== Image signature trust"
 check "policy.json trusts ghcr.io/shad0wcrawl3r/legionforge via sigstore + registries.d attachments" \
   "jq -e '.transports.docker[\"ghcr.io/shad0wcrawl3r/legionforge\"][0] | .type == \"sigstoreSigned\" and .keyPath == \"/etc/pki/containers/legionforge.pub\"' /etc/containers/policy.json && grep -q 'use-sigstore-attachments: true' /etc/containers/registries.d/legionforge.yaml && jq -e '.transports.docker[\"ghcr.io/ublue-os\"]' /etc/containers/policy.json"

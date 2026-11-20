@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Legix
+Description=Legix boot animation: the L fins appear, the visor drops and pushes them out, then the gem drops in.
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/legix
+ScriptFile=/usr/share/plymouth/themes/legix/legix.script

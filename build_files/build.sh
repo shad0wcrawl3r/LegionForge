@@ -199,3 +199,19 @@ jq --arg repo "ghcr.io/shad0wcrawl3r/legionforge" \
    "$policy" > "$policy.new"
 mv "$policy.new" "$policy"
 jq -e '.transports.docker["ghcr.io/shad0wcrawl3r/legionforge"][0].type == "sigstoreSigned"' "$policy"
+
+#### Legix boot animation (Plymouth script theme)
+# Replaces Bazzite's default (bgrt: firmware logo + spinner). Theme files come
+# from system_files/; the PNG parts are rendered in the plymouth-assets stage.
+dnf5 install -y plymouth-plugin-script
+install -m0644 /ctx/plymouth/*.png /usr/share/plymouth/themes/legix/
+plymouth-set-default-theme legix
+grep -qx 'Theme=legix' /etc/plymouth/plymouthd.conf
+# Plymouth runs from the initramfs, so rebuild it with the theme inside. The
+# atomic/bootc dracut settings in /usr/lib/dracut/dracut.conf.d still apply.
+mapfile -t KVERS < <(ls /usr/lib/modules)
+test "${#KVERS[@]}" -eq 1
+KVER="${KVERS[0]}"
+dracut --no-hostonly --kver "$KVER" --reproducible -v --add ostree \
+    -f "/usr/lib/modules/$KVER/initramfs.img"
+chmod 0600 "/usr/lib/modules/$KVER/initramfs.img"
