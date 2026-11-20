@@ -36,14 +36,17 @@ to act (e.g. `feat!: switch base to bazzite-deck-gnome`).
 
 ## Patched Noctalia (lock-screen keyboard)
 
-LegionForge ships Noctalia with upstream PR #5233 (`patches/`). Compiling it takes
-about 70 minutes, so CI caches the RPM, keyed on Fedora's noctalia version and on
-`patches/` and `build_files/noctalia-osk/`. It's rebuilt only when one of those
-changes. For a local `just build` with the patch, build the RPM first:
+LegionForge ships Noctalia with upstream PR #5233 (the lock-screen on-screen keyboard).
+The RPM is built and released by
+[shad0wcrawl3r/noctalia-osk](https://github.com/shad0wcrawl3r/noctalia-osk), once per
+Fedora noctalia version. CI downloads it with `.github/scripts/fetch-noctalia.sh`,
+which checks `SHA256SUMS` and the GitHub build-provenance attestation. To change the
+patch, open a PR there and bump its `REVISION`.
+
+For a local `just build` with the patch:
 
 ```sh
-podman build -f build_files/noctalia-osk/Containerfile -t noctalia-osk .
-podman cp "$(podman create noctalia-osk):/out/." noctalia-rpms/
+.github/scripts/fetch-noctalia.sh noctalia-rpms
 ```
 
 Without it, the image uses Fedora's noctalia, and the smoke test's lock-screen
