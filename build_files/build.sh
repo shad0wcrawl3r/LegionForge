@@ -45,7 +45,7 @@ KEEP=(
     xdg-desktop-portal-gnome xdg-desktop-portal-gtk
     nautilus
 )
-dnf5 mark user "${KEEP[@]}"
+dnf5 mark -y user "${KEEP[@]}"
 dnf5 remove -y \
     gdm \
     gnome-shell \
