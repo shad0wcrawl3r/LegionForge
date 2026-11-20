@@ -157,3 +157,11 @@ ln -sf ../noctalia.service /usr/lib/systemd/user/niri.service.wants/noctalia.ser
 # Seed LegionForge's Noctalia defaults (full-width bar, icon-only widgets)
 # into ~/.config/noctalia before Noctalia starts. See noctalia.service.d/.
 chmod 0755 /usr/libexec/legionforge-noctalia-defaults
+
+#### Desk lock: lock niri on start, after 5 min idle and before suspend.
+# Idle/suspend locking comes from the Noctalia defaults above; this unit
+# locks immediately when niri starts (Switch to Desktop autologins).
+chmod 0755 /usr/libexec/legionforge-lock-on-desktop
+ln -sf ../legionforge-lock-on-desktop.service \
+    /usr/lib/systemd/user/niri.service.wants/legionforge-lock-on-desktop.service
+test -e /etc/pam.d/noctalia

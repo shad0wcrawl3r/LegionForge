@@ -38,3 +38,12 @@ show_glyph = true
 type = "battery"
 show_label = true
 show_glyph = true
+
+# Lock after 5 minutes idle, and before every suspend.
+[idle.behavior.lock]
+enabled = true
+timeout = 300.0
+
+[lockscreen]
+enabled = true
+lock_before_suspend = true

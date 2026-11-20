@@ -1,0 +1,15 @@
+#!/bin/bash
+# LegionForge: lock the niri desktop as soon as it starts, so Switch to Desktop
+# (which autologins) always asks for the user's password.
+set -uo pipefail
+# Never lock without a PAM service that can unlock it again.
+if [[ ! -e /etc/pam.d/noctalia ]]; then
+  echo "legionforge-lock-on-desktop: /etc/pam.d/noctalia missing; not locking" >&2
+  exit 0
+fi
+for _ in $(seq 1 40); do
+  noctalia msg session lock >/dev/null 2>&1 && exit 0
+  sleep 0.5
+done
+echo "legionforge-lock-on-desktop: Noctalia did not accept the lock request" >&2
+exit 1
