@@ -28,8 +28,8 @@ check() {
 }
 
 echo "== Packages and session wiring"
-check "packages installed (niri noctalia xwayland-satellite portals)" \
-  "rpm -q niri noctalia xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk"
+check "packages installed (niri noctalia wtype xwayland-satellite portals)" \
+  "rpm -q niri noctalia wtype xwayland-satellite xdg-desktop-portal-gnome xdg-desktop-portal-gtk"
 check "niri wayland session exists" \
   "test -f /usr/share/wayland-sessions/niri.desktop"
 check "os-session-select override is executable and parses" \
@@ -57,6 +57,9 @@ check "Bazzite Portal does not autostart for new users" \
 
 check "desk security: away-to-Gaming-Mode wired, never auto-locks niri (no keyboard)" \
   "test -x /usr/libexec/legionforge-away && bash -n /usr/libexec/legionforge-away && test \"\$(readlink -f /usr/lib/systemd/user/niri.service.wants/legionforge-away-on-resume.service)\" = /usr/lib/systemd/user/legionforge-away-on-resume.service && test ! -e /usr/lib/systemd/user/niri.service.wants/legionforge-lock-on-desktop.service && grep -qx 'lock_before_suspend = false' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -A3 '^\[idle.behavior.lock\]' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml | grep -q 'enabled = false'"
+
+check "on-screen keyboard: plugin enabled and on the bar by default" \
+  "grep -q 'enabled = \\[ .omerfuyar/keyboard. \\]' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -q 'omerfuyar/keyboard:widget' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -qE '^ +.osk.,$' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml"
 
 echo "== GNOME removed, niri essentials kept"
 check "GNOME desktop removed (gdm gnome-shell gnome-session gnome-control-center)" \

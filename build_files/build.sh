@@ -19,9 +19,11 @@ dnf5 install -y tmux
 # official Fedora repos, so no COPRs to maintain. Dotfiles are user-provided.
 #  - xwayland-satellite: X11 app support under niri
 #  - xdg-desktop-portal-gnome/gtk: portals niri uses for screencast & file pickers
+#  - wtype: types the Noctalia on-screen keyboard's keys (Keyboard plugin)
 dnf5 install -y \
     niri \
     noctalia \
+    wtype \
     xwayland-satellite \
     xdg-desktop-portal-gnome \
     xdg-desktop-portal-gtk
