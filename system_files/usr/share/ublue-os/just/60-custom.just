@@ -22,29 +22,19 @@ restore-noctalia-setup:
 # On-screen keyboard help for niri
 restore-virtual-keyboard:
     #!/usr/bin/bash
-    echo "niri has no built-in on-screen keyboard."
-    echo "While Steam is running, press STEAM + X to open Steam's keyboard over any app."
+    echo "On-screen keyboard: tap the keyboard button on Noctalia's bar."
+    echo "On the lock screen: touch the screen, or tap the keyboard button by the password box."
+    echo "While Steam is running, STEAM + X also opens Steam's keyboard over any app."
 
 # Check your niri config for errors
 niri-validate:
     niri validate
 
-# Leave the desktop for Gaming Mode now (Steam's PIN locks it, if set)
+# Leave the desktop for Gaming Mode now (Steam's PIN applies, if set)
 away:
     /usr/libexec/legionforge-away
 
-# Turn "go to Gaming Mode when waking in the desktop" on or off for this user
-toggle-away-on-wake:
-    #!/usr/bin/bash
-    flag="${XDG_CONFIG_HOME:-$HOME/.config}/legionforge/no-away-on-wake"
-    if [[ -e "$flag" ]]; then
-      rm -f "$flag"; echo "ON: waking in the desktop goes to Gaming Mode (Steam PIN)."
-    else
-      mkdir -p "$(dirname "$flag")"; touch "$flag"; echo "OFF: the desktop wakes unlocked."
-    fi
-    echo "Takes effect at the next desktop session."
-
-# Lock with Noctalia's own lock screen now, to try its on-screen keyboard
-# (touch the lock screen, or tap the keyboard button next to the password box)
-test-noctalia-lock:
+# Lock now with Noctalia's lock screen (touch it, or tap the keyboard button
+# next to the password box, for the on-screen keyboard)
+lock:
     noctalia msg session lock

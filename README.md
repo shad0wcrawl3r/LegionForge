@@ -33,13 +33,13 @@ can't be unlocked at all. Fedora's noctalia doesn't have the feature yet (upstre
 |---|---|---|
 | Gaming Mode | Steam via OpenGamepadUI | Same |
 | Switch to Desktop | GNOME | niri with the Noctalia shell |
-| Desktop when idle, or when it wakes from sleep | Stays open | Goes to Gaming Mode, so Steam's lock-screen PIN applies |
+| Desktop lock | GNOME's (needs a keyboard to unlock) | Noctalia's lock screen with an on-screen keyboard; locks after 5 minutes idle and before sleep |
 | On-screen keyboard in the desktop | GNOME's | Noctalia [Keyboard](https://github.com/noctalia-dev/community-plugins) plugin, from the keyboard button on the bar |
 | Bazzite Portal at login | Opens | Doesn't open (it's still in the app launcher) |
 | GNOME desktop, extensions, GNOME Settings | Installed | Removed (about 200 MB) |
 
 You bring your own niri and Noctalia dotfiles. The image only sets a few Noctalia defaults:
-a full-width bar, icon-only widgets, the keyboard button, and the Gaming Mode lock. Your own
+a full-width bar, icon-only widgets, the keyboard button, and the lock settings. Your own
 files in `~/.config/noctalia/`, and anything you change in Noctalia's Settings, override
 them.
 
@@ -107,27 +107,31 @@ shows its own image.
 
 ### 6. Set up locking
 
-LegionForge locks the desktop by sending you to Gaming Mode, so set Steam's PIN: in Gaming
-Mode, open **Settings → Security** and turn on the lock-screen PIN for startup, for waking
-from sleep and for switching to Desktop Mode. Without a PIN, anyone can use the device.
+- **The desktop** locks with Noctalia's lock screen and your account password. Touch the
+  screen to bring up its on-screen keyboard.
+- **Gaming Mode** is guarded by Steam's PIN. In Gaming Mode, open **Settings → Security** and
+  turn on the lock-screen PIN for startup, for waking from sleep and for switching to Desktop
+  Mode. Without a PIN, anyone can use Gaming Mode.
 
 ## Using it
 
 - **Gaming Mode** works like stock Bazzite.
 - **Switch to Desktop** (in the Steam menu) opens niri. The first time, Noctalia's setup
   wizard runs.
-- **Lock (Gaming Mode)**, in Noctalia's power menu, returns to Gaming Mode, where Steam's PIN
-  applies. The desktop does the same after 5 minutes idle and when the device wakes from
-  sleep. Leaving the desktop closes its apps.
+- **Noctalia's power menu:**
+  - **Lock** shows Noctalia's lock screen. Touch it, or tap the keyboard button next to the
+    password box, for the on-screen keyboard. The desktop also locks after 5 minutes idle
+    and before sleep.
+  - **Gaming Mode (Steam PIN)** leaves the desktop for Gaming Mode, closing its apps.
+  - **Lock and suspend** locks, then sleeps.
 - **On-screen keyboard:** tap the keyboard button on the bar, then **On-screen keyboard**.
-  It can't appear on a lock screen, which is why Steam's PIN is the lock.
 
 ### Commands
 
 | Command | What it does |
 |---|---|
 | `ujust away` | Go to Gaming Mode now |
-| `ujust toggle-away-on-wake` | Turn "go to Gaming Mode when waking in the desktop" on or off |
+| `ujust lock` | Lock the desktop now |
 | `ujust restore-noctalia-setup` | Back up your Noctalia settings and run its setup wizard again |
 | `ujust niri-validate` | Check your niri config for errors |
 
