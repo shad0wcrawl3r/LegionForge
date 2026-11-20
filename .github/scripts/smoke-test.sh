@@ -61,6 +61,9 @@ check "desk security: away-to-Gaming-Mode wired, never auto-locks niri (no keybo
 check "on-screen keyboard: plugin enabled and on the bar by default" \
   "grep -q 'enabled = \\[ .omerfuyar/keyboard. \\]' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -q 'omerfuyar/keyboard:widget' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -qE '^ +.osk.,$' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml"
 
+check "Noctalia lock screen has the on-screen keyboard (lockscreen.keyboard setting)" \
+  "printf '[lockscreen]\\nkeyboard = \"auto\"\\n' > /tmp/osk.toml && noctalia config validate /tmp/osk.toml 2>&1 | grep -q 'Config is valid' && ! noctalia config validate /tmp/osk.toml 2>&1 | grep -q 'unknown setting'"
+
 echo "== GNOME removed, niri essentials kept"
 check "GNOME desktop removed (gdm gnome-shell gnome-session gnome-control-center)" \
   "for p in gdm gnome-shell gnome-session gnome-control-center; do ! rpm -q \$p; done && test ! -e /usr/share/wayland-sessions/gnome.desktop"

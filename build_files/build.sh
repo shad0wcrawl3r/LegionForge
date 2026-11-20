@@ -20,9 +20,12 @@ dnf5 install -y tmux
 #  - xwayland-satellite: X11 app support under niri
 #  - xdg-desktop-portal-gnome/gtk: portals niri uses for screencast & file pickers
 #  - wtype: types the Noctalia on-screen keyboard's keys (Keyboard plugin)
+# Noctalia: our patched build (lock-screen on-screen keyboard) when one was
+# produced, otherwise Fedora's package.
+mapfile -t NOCTALIA_PKG < <(ls /ctx/noctalia-rpms/noctalia-*.rpm 2>/dev/null || echo noctalia)
 dnf5 install -y \
     niri \
-    noctalia \
+    "${NOCTALIA_PKG[@]}" \
     wtype \
     xwayland-satellite \
     xdg-desktop-portal-gnome \

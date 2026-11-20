@@ -43,3 +43,8 @@ toggle-away-on-wake:
       mkdir -p "$(dirname "$flag")"; touch "$flag"; echo "OFF: the desktop wakes unlocked."
     fi
     echo "Takes effect at the next desktop session."
+
+# Lock with Noctalia's own lock screen now, to try its on-screen keyboard
+# (touch the lock screen, or tap the keyboard button next to the password box)
+test-noctalia-lock:
+    noctalia msg session lock
