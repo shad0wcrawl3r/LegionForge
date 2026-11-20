@@ -1,0 +1,12 @@
+[Unit]
+Description=LegionForge: open niri from Switch to Desktop
+Documentation=https://github.com/shad0wcrawl3r/LegionForge
+After=steamos-manager.service
+Wants=steamos-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/legionforge-desktop-session
+
+[Install]
+WantedBy=default.target

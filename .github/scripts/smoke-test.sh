@@ -45,6 +45,9 @@ check "noctalia is pulled in by niri.service" \
 check "no Noctalia settings shipped (first-run wizard must appear)" \
   "! find /etc/skel /usr/share/noctalia -name settings.toml 2>/dev/null | grep -q ."
 
+check "steamos-manager desktop pinned to niri at login (OpenGamepadUI path)" \
+  "test -x /usr/libexec/legionforge-desktop-session && bash -n /usr/libexec/legionforge-desktop-session && test -L /etc/systemd/user/default.target.wants/legionforge-desktop-session.service"
+
 echo "== GNOME removed, niri essentials kept"
 check "GNOME desktop removed (gdm gnome-shell gnome-session gnome-control-center)" \
   "for p in gdm gnome-shell gnome-session gnome-control-center; do ! rpm -q \$p; done && test ! -e /usr/share/wayland-sessions/gnome.desktop"

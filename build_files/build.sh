@@ -64,6 +64,12 @@ dnf5 remove -y \
 rpm -q "${KEEP[@]}"
 test ! -e /usr/share/wayland-sessions/gnome.desktop
 
+# Switch to Desktop from OpenGamepadUI/Steam goes straight to steamos-manager,
+# which uses the per-user desktop_session (it overrides platform.toml and may
+# still say gnome.desktop). Re-assert niri at every login.
+chmod 0755 /usr/libexec/legionforge-desktop-session
+systemctl --global enable legionforge-desktop-session.service
+
 # ujust: drop GNOME-only recipes. Every recipe file is a mandatory import, so
 # empty 90-bazzite-de.just (restore-gnome-de-settings, restore-gnome-folders)
 # rather than deleting it. restore-virtual-keyboard is replaced by the niri
