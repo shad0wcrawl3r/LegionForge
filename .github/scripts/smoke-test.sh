@@ -45,6 +45,16 @@ check "noctalia is pulled in by niri.service" \
 check "no Noctalia settings shipped (first-run wizard must appear)" \
   "! find /etc/skel /usr/share/noctalia -name settings.toml 2>/dev/null | grep -q ."
 
+echo "== GNOME removed, niri essentials kept"
+check "GNOME desktop removed (gdm gnome-shell gnome-session gnome-control-center)" \
+  "for p in gdm gnome-shell gnome-session gnome-control-center; do ! rpm -q \$p; done && test ! -e /usr/share/wayland-sessions/gnome.desktop"
+check "kept: sddm, oo7 password store + PAM unlock, portals, nautilus file picker" \
+  "rpm -q sddm oo7-daemon oo7-portal pam_oo7 xdg-desktop-portal-gnome xdg-desktop-portal-gtk nautilus"
+check "ujust parses and has the LegionForge recipes" \
+  "JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -q restore-noctalia-setup"
+check "no GNOME-only ujust recipes left" \
+  "! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -qE 'restore-gnome-(de-settings|folders)' && ! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --show restore-virtual-keyboard | grep -q gnome-extensions"
+
 echo "== SELinux types vs device policy (${DEVICE_BASE})"
 in_image "cat /etc/selinux/targeted/contexts/files/file_contexts" > "$WORK/file_contexts"
 if ! podman image exists "$DEVICE_BASE"; then

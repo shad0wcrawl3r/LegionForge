@@ -34,6 +34,46 @@ sed -i 's/^desktop = "gnome.desktop"$/desktop = "niri.desktop"/' \
     /usr/share/steamos-manager/platform.toml
 grep -qx 'desktop = "niri.desktop"' /usr/share/steamos-manager/platform.toml
 
+#### Remove the GNOME desktop: niri is the only desktop.
+# SDDM (not GDM) handles autologin into Gaming Mode and Switch to Desktop.
+# Keep what niri still needs. pam_oo7 matters: it is only installed because
+# gdm requires it, yet SDDM's PAM stack uses it to unlock the oo7 password
+# store at login, so it must not be autoremoved along with gdm.
+KEEP=(
+    sddm
+    oo7-daemon oo7-portal pam_oo7
+    xdg-desktop-portal-gnome xdg-desktop-portal-gtk
+    nautilus
+)
+dnf5 mark user "${KEEP[@]}"
+dnf5 remove -y \
+    gdm \
+    gnome-shell \
+    gnome-session \
+    gnome-session-wayland-session \
+    gnome-control-center \
+    gnome-shell-extension-common \
+    gnome-shell-extension-gsconnect \
+    gnome-shell-extension-user-theme \
+    gnome-browser-connector \
+    nautilus-gsconnect \
+    gnome-search-yafti \
+    gnome-remote-desktop \
+    gnome-user-share \
+    steamdeck-gnome-presets
+rpm -q "${KEEP[@]}"
+test ! -e /usr/share/wayland-sessions/gnome.desktop
+
+# ujust: drop GNOME-only recipes. Every recipe file is a mandatory import, so
+# empty 90-bazzite-de.just (restore-gnome-de-settings, restore-gnome-folders)
+# rather than deleting it. restore-virtual-keyboard is replaced by the niri
+# version in 60-custom.just.
+grep -q '^restore-gnome-de-settings:' /usr/share/ublue-os/just/90-bazzite-de.just
+echo "# LegionForge: GNOME is not installed; GNOME recipes removed." \
+    > /usr/share/ublue-os/just/90-bazzite-de.just
+/ctx/drop_just_recipe.py /usr/share/ublue-os/just/85-bazzite-image.just restore-virtual-keyboard
+JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list > /dev/null
+
 # Use a COPR Example:
 #
 # dnf5 -y copr enable ublue-os/staging
