@@ -2,6 +2,8 @@
 FROM scratch AS ctx
 COPY build_files /
 COPY system_files /system_files
+# Public half of the image signing key, installed so devices can verify updates.
+COPY cosign.pub /cosign.pub
 
 # Base Image
 FROM ghcr.io/ublue-os/bazzite-deck-gnome:stable

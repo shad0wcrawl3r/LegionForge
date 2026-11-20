@@ -113,6 +113,22 @@ remove_exactly \
 rpm -q "${KEEP[@]}"
 test ! -e /usr/share/wayland-sessions/gnome.desktop
 
+# GNOME Shell extensions that Bazzite copies in without an RPM (Caffeine,
+# Burn My Windows, Add to Steam, Blur My Shell, Desktop Cube, ...). They are
+# dead weight without gnome-shell. Fail if any file still belongs to a package,
+# so a packaged extension is never deleted behind rpm's back.
+if [[ -d /usr/share/gnome-shell/extensions ]]; then
+    owned="$(find /usr/share/gnome-shell/extensions -type f -print0 \
+        | xargs -0 -r rpm -qf 2>/dev/null | grep -v 'not owned' | sort -u || true)"
+    if [[ -n "$owned" ]]; then
+        echo "GNOME Shell extensions still owned by packages:" >&2
+        echo "$owned" >&2
+        exit 1
+    fi
+    rm -rf /usr/share/gnome-shell/extensions
+fi
+rmdir /usr/share/gnome-shell 2>/dev/null || true
+
 # Switch to Desktop from OpenGamepadUI/Steam goes straight to steamos-manager,
 # which uses the per-user desktop_session (it overrides platform.toml and may
 # still say gnome.desktop). Re-assert niri at every login.
@@ -169,3 +185,16 @@ ln -sf ../legionforge-away-on-resume.service \
     /usr/lib/systemd/user/niri.service.wants/legionforge-away-on-resume.service
 # Kept for keyboard users who lock manually: deterministic PAM service.
 test -e /etc/pam.d/noctalia
+
+#### Image signature verification on the device (LFORGE-7)
+# Trust LegionForge's cosign key for ghcr.io/shad0wcrawl3r/legionforge, the
+# same way Bazzite trusts ghcr.io/ublue-os. Devices then switch once with
+# `bootc switch --enforce-container-sigpolicy` and refuse unsigned updates.
+install -Dm0644 /ctx/cosign.pub /etc/pki/containers/legionforge.pub
+policy=/etc/containers/policy.json
+jq --arg repo "ghcr.io/shad0wcrawl3r/legionforge" \
+   --arg key "/etc/pki/containers/legionforge.pub" \
+   '.transports.docker[$repo] = [{"type": "sigstoreSigned", "keyPath": $key, "signedIdentity": {"type": "matchRepository"}}]' \
+   "$policy" > "$policy.new"
+mv "$policy.new" "$policy"
+jq -e '.transports.docker["ghcr.io/shad0wcrawl3r/legionforge"][0].type == "sigstoreSigned"' "$policy"

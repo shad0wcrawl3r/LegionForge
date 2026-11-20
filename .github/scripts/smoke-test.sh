@@ -68,10 +68,22 @@ check "kept: sddm, oo7 password store + PAM unlock, portals, nautilus, VPN dialo
   "rpm -q sddm oo7-daemon oo7-portal pam_oo7 xdg-desktop-portal-gnome xdg-desktop-portal-gtk nautilus gnome-disk-utility NetworkManager-openvpn-gnome NetworkManager-openconnect-gnome pinentry-gnome3 adw-gtk3-theme"
 check "unused GNOME pieces removed (mutter, gnome-settings-daemon, evolution-data-server, docs)" \
   "for p in mutter gnome-settings-daemon evolution-data-server gnome-user-docs gnome-backgrounds gjs; do ! rpm -q \$p; done"
+check "no leftover GNOME Shell extensions" \
+  "test ! -e /usr/share/gnome-shell/extensions"
 check "ujust parses and has the LegionForge recipes" \
   "JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -q restore-noctalia-setup"
 check "no GNOME-only ujust recipes left" \
   "! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -qE 'restore-gnome-(de-settings|folders)' && ! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --show restore-virtual-keyboard | grep -q gnome-extensions"
+
+echo "== Image signature trust"
+check "policy.json trusts ghcr.io/shad0wcrawl3r/legionforge via sigstore + registries.d attachments" \
+  "jq -e '.transports.docker[\"ghcr.io/shad0wcrawl3r/legionforge\"][0] | .type == \"sigstoreSigned\" and .keyPath == \"/etc/pki/containers/legionforge.pub\"' /etc/containers/policy.json && grep -q 'use-sigstore-attachments: true' /etc/containers/registries.d/legionforge.yaml && jq -e '.transports.docker[\"ghcr.io/ublue-os\"]' /etc/containers/policy.json"
+if cmp -s <(in_image "cat /etc/pki/containers/legionforge.pub") cosign.pub; then
+  echo "ok   - shipped signing key matches cosign.pub"
+else
+  echo "::error title=Smoke test::shipped /etc/pki/containers/legionforge.pub differs from cosign.pub"
+  fail=1
+fi
 
 echo "== SELinux types vs device policy (${DEVICE_BASE})"
 in_image "cat /etc/selinux/targeted/contexts/files/file_contexts" > "$WORK/file_contexts"
