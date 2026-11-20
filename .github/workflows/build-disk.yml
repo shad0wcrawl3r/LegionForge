@@ -60,16 +60,46 @@ jobs:
             "${IMAGE_REGISTRY}/${IMAGE_NAME}:${{ inputs.tag }}" > /dev/null
           echo "Signature OK for ${IMAGE_REGISTRY}/${IMAGE_NAME}:${{ inputs.tag }}"
 
+      # bootc-image-builder's own GitHub Actions workaround
+      # (osbuild/bootc-image-builder#446): a clean rootful overlay store.
+      - name: Configure podman storage
+        run: |
+          sudo rm -rf /var/lib/containers/storage
+          sudo mkdir -p /etc/containers
+          printf '[storage]\ndriver = "overlay"\nrunroot = "/run/containers/storage"\ngraphroot = "/var/lib/containers/storage"\n' \
+            | sudo tee /etc/containers/storage.conf > /dev/null
+
+      # Fedora 45 keeps its base repos (fedora, updates) in
+      # /usr/share/dnf5/repos.d, which dnf5 reads but bootc-image-builder's
+      # depsolver doesn't: it only reads /etc/yum.repos.d, so every installer
+      # package (anaconda, grub2, shim) was "No match". Build the ISO from a
+      # local copy with those repo files also in /etc/yum.repos.d. Installs
+      # switch to the signed registry image on first boot regardless.
+      - name: Prepare image for the installer build
+        run: |
+          set -euo pipefail
+          src="${IMAGE_REGISTRY}/${IMAGE_NAME}:${{ inputs.tag }}"
+          sudo podman pull "$src"
+          printf 'FROM %s\nRUN cp /usr/share/dnf5/repos.d/fedora.repo /usr/share/dnf5/repos.d/fedora-updates.repo /etc/yum.repos.d/\n' "$src" > Containerfile.iso
+          sudo podman build --pull=never -t localhost/legionforge-iso:latest -f Containerfile.iso .
+
+      # Run bootc-image-builder directly (what the deprecated
+      # bootc-image-builder-action does), because the action always pulls
+      # the image and so can't use the local one above.
       - name: Build ISO
         id: build
-        uses: osbuild/bootc-image-builder-action@028e4d28330efe546229eb9cb52aee78174d2347 # main
-        with:
-          builder-image: ${{ env.BIB_IMAGE }}
-          config-file: ./disk_config/iso.toml
-          image: ${{ env.IMAGE_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ inputs.tag }}
-          chown: ${{ env.USER_UID }}:${{ env.USER_GID }}
-          types: anaconda-iso
-          additional-args: --use-librepo=True
+        run: |
+          set -euo pipefail
+          mkdir -p output
+          sudo podman pull "${BIB_IMAGE}"
+          sudo podman run --rm --privileged --security-opt label=type:unconfined_t \
+            --volume /var/lib/containers/storage:/var/lib/containers/storage \
+            --volume "$PWD/output:/output" \
+            --volume "$PWD/disk_config/iso.toml:/config.toml:ro" \
+            "${BIB_IMAGE}" \
+            build --output /output --chown "${USER_UID}:${USER_GID}" --use-librepo=True \
+            --type anaconda-iso localhost/legionforge-iso:latest
+          echo "output-directory=$PWD/output" >> "$GITHUB_OUTPUT"
 
       - name: Checksum and report size
         id: report

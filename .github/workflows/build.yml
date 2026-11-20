@@ -66,6 +66,36 @@ jobs:
           echo "IMAGE_REGISTRY=${IMAGE_REGISTRY,,}" >> ${GITHUB_ENV}
           echo "IMAGE_NAME=${IMAGE_NAME,,}" >> ${GITHUB_ENV}
 
+      # Patched Noctalia (lock-screen on-screen keyboard). Compiling it takes
+      # ~70 min, so cache the RPM keyed on Fedora's noctalia version plus the
+      # patch and build script, and only rebuild when one of those changes.
+      - name: Resolve Fedora's Noctalia version
+        id: noctalia-ver
+        run: |
+          set -euo pipefail
+          evr="$(podman run --rm registry.fedoraproject.org/fedora:45 \
+            dnf5 -q repoquery --latest-limit=1 --queryformat '%{evr}\n' noctalia | tail -1)"
+          test -n "$evr"
+          echo "evr=$evr" >> "$GITHUB_OUTPUT"
+          echo "Fedora noctalia: $evr"
+
+      - name: Restore patched Noctalia RPM
+        id: noctalia-cache
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: noctalia-rpms
+          key: noctalia-osk-${{ steps.noctalia-ver.outputs.evr }}-${{ hashFiles('patches/**', 'build_files/noctalia-osk/**') }}
+
+      - name: Build patched Noctalia RPM (cache miss only)
+        if: steps.noctalia-cache.outputs.cache-hit != 'true'
+        run: |
+          set -euo pipefail
+          podman build -f build_files/noctalia-osk/Containerfile -t localhost/noctalia-osk .
+          cid="$(podman create localhost/noctalia-osk)"
+          podman cp "$cid:/out/." noctalia-rpms/
+          podman rm "$cid"
+          ls -la noctalia-rpms
+
       # This actually builds the container image
       - name: Build Image
         id: build-image
