@@ -1,0 +1,28 @@
+# Anaconda installer ISO for LegionForge (built by .github/workflows/build-disk.yml
+# or `just build-iso`).
+
+[customizations.installer.kickstart]
+contents = """
+%post
+# Track LegionForge from the registry with signature checking on from day one.
+# The installed system already trusts LegionForge's key (policy.json), so
+# every update must be signed with cosign.pub.
+bootc switch --mutate-in-place --transport registry --enforce-container-sigpolicy ghcr.io/shad0wcrawl3r/legionforge:latest
+%end
+"""
+
+[customizations.installer.modules]
+enable = [
+  "org.fedoraproject.Anaconda.Modules.Storage",
+  "org.fedoraproject.Anaconda.Modules.Runtime",
+  # Bazzite Deck GNOME has no GNOME Initial Setup, so the installer must
+  # create the user account.
+  "org.fedoraproject.Anaconda.Modules.Users",
+  "org.fedoraproject.Anaconda.Modules.Timezone"
+]
+disable = [
+  "org.fedoraproject.Anaconda.Modules.Network",
+  "org.fedoraproject.Anaconda.Modules.Security",
+  "org.fedoraproject.Anaconda.Modules.Services",
+  "org.fedoraproject.Anaconda.Modules.Subscription"
+]
