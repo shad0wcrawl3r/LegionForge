@@ -1,15 +1,15 @@
 #!/bin/bash
-# LegionForge "away" action: leave the niri desktop for Gaming Mode, where
+# Legix "away" action: leave the niri desktop for Gaming Mode, where
 # Steam's lock-screen PIN (controller-friendly number pad) guards the device.
 # Offered in Noctalia's power menu as "Gaming Mode (Steam PIN)" and as
 # `ujust away`; the desktop's own lock is Noctalia's lock screen.
-#   legionforge-away            switch to Gaming Mode
-#   legionforge-away --suspend  switch to Gaming Mode, then suspend
+#   legix-away            switch to Gaming Mode
+#   legix-away --suspend  switch to Gaming Mode, then suspend
 set -euo pipefail
 if [[ "${1:-}" == "--suspend" ]]; then
   # Schedule the suspend outside this session: switching to Gaming Mode
   # ends the niri session (and this script with it).
-  systemd-run --user --quiet --on-active=10 --unit=legionforge-away-suspend \
+  systemd-run --user --quiet --on-active=10 --unit=legix-away-suspend \
     systemctl suspend || true
 fi
 steamosctl set-default-login-mode game

@@ -1,0 +1,8 @@
+# Legix images are signed with cosign; signatures are stored as sigstore
+# attachments next to the image in the registry.
+docker:
+  ghcr.io/shad0wcrawl3r/legix:
+    use-sigstore-attachments: true
+  # Pre-rename image name (LegionForge), still published during the move.
+  ghcr.io/shad0wcrawl3r/legionforge:
+    use-sigstore-attachments: true

@@ -1,18 +1,20 @@
 #!/bin/bash
-# LegionForge: Steam's "Switch to Desktop" calls steamos-session-select, which
+# Legix: Steam's "Switch to Desktop" calls steamos-session-select, which
 # runs this file in preference to Bazzite's /usr/libexec/os-session-select.
-# Bazzite's version hard-codes gnome.desktop (which LegionForge removes); this
+# Bazzite's version hard-codes gnome.desktop (which Legix removes); this
 # one opens niri instead.
 #
 # Override per machine by writing a session name (a file in
-# /usr/share/wayland-sessions/) to /etc/legionforge/desktop-session.
+# /usr/share/wayland-sessions/) to /etc/legix/desktop-session.
 
 set -e
 
 session="${1:-gamescope}"
 
 desktop_session="niri.desktop"
-override=/etc/legionforge/desktop-session
+override=/etc/legix/desktop-session
+# Pre-rename path (LegionForge), still honoured.
+[[ -r "$override" ]] || override=/etc/legionforge/desktop-session
 if [[ -r "$override" ]]; then
   desktop_session="$(tr -d '[:space:]' < "$override")"
 fi

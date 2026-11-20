@@ -1,6 +1,6 @@
-# LegionForge image defaults for Noctalia. Your own *.toml files here and the
+# Legix image defaults for Noctalia. Your own *.toml files here and the
 # Settings UI override these. This file is refreshed from the image each time
-# Noctalia starts; to stop that, create ~/.config/noctalia/.legionforge-no-defaults
+# Noctalia starts; to stop that, create ~/.config/noctalia/.legix-no-defaults
 # (and delete this file).
 
 # Full-width bar, square ends.
@@ -85,7 +85,7 @@ timeout = 300.0
 
 [idle.behavior.away]
 action = "command"
-command = "/usr/libexec/legionforge-away"
+command = "/usr/libexec/legix-away"
 enabled = false
 timeout = 300.0
 
@@ -99,7 +99,7 @@ shortcut = "1"
 
 [[shell.session.actions]]
 action = "logout"
-command = "/usr/libexec/legionforge-away"
+command = "/usr/libexec/legix-away"
 label = "Gaming Mode (Steam PIN)"
 shortcut = "2"
 

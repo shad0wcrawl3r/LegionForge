@@ -1,13 +1,13 @@
-# Anaconda installer ISO for LegionForge, built locally with `just build-iso`
+# Anaconda installer ISO for Legix, built locally with `just build-iso`
 # (not built or published by CI; see CONTRIBUTING.md).
 
 [customizations.installer.kickstart]
 contents = """
 %post
-# Track LegionForge from the registry with signature checking on from day one.
-# The installed system already trusts LegionForge's key (policy.json), so
+# Track Legix from the registry with signature checking on from day one.
+# The installed system already trusts Legix's key (policy.json), so
 # every update must be signed with cosign.pub.
-bootc switch --mutate-in-place --transport registry --enforce-container-sigpolicy ghcr.io/shad0wcrawl3r/legionforge:latest
+bootc switch --mutate-in-place --transport registry --enforce-container-sigpolicy ghcr.io/shad0wcrawl3r/legix:latest
 %end
 """
 

@@ -1,4 +1,4 @@
-# LegionForge recipes for the niri + Noctalia desktop. GNOME is not installed;
+# Legix recipes for the niri + Noctalia desktop. GNOME is not installed;
 # GNOME-only Bazzite recipes are removed at build time (see build.sh).
 
 # Re-run Noctalia's first-start setup wizard (current settings are backed up)
@@ -32,7 +32,7 @@ niri-validate:
 
 # Leave the desktop for Gaming Mode now (Steam's PIN applies, if set)
 away:
-    /usr/libexec/legionforge-away
+    /usr/libexec/legix-away
 
 # Lock now with Noctalia's lock screen (touch it, or tap the keyboard button
 # next to the password box, for the on-screen keyboard)
