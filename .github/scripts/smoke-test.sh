@@ -68,6 +68,8 @@ check "kept: sddm, oo7 password store + PAM unlock, portals, nautilus, VPN dialo
   "rpm -q sddm oo7-daemon oo7-portal pam_oo7 xdg-desktop-portal-gnome xdg-desktop-portal-gtk nautilus gnome-disk-utility NetworkManager-openvpn-gnome NetworkManager-openconnect-gnome pinentry-gnome3 adw-gtk3-theme"
 check "unused GNOME pieces removed (mutter, gnome-settings-daemon, evolution-data-server, docs)" \
   "for p in mutter gnome-settings-daemon evolution-data-server gnome-user-docs gnome-backgrounds gjs; do ! rpm -q \$p; done"
+check "no leftover GNOME Shell extensions" \
+  "test ! -e /usr/share/gnome-shell/extensions"
 check "ujust parses and has the LegionForge recipes" \
   "JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -q restore-noctalia-setup"
 check "no GNOME-only ujust recipes left" \
