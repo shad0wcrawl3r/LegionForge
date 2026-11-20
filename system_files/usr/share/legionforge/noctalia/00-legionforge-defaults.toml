@@ -1,0 +1,40 @@
+# LegionForge image defaults for Noctalia. Your own *.toml files here and the
+# Settings UI override these. This file is refreshed from the image each time
+# Noctalia starts; to stop that, create ~/.config/noctalia/.legionforge-no-defaults
+# (and delete this file).
+
+# Full-width bar, square ends.
+[bar.default]
+margin_ends = 0
+radius = 0
+radius_top_left = 0
+radius_top_right = 0
+radius_bottom_left = 0
+radius_bottom_right = 0
+
+# The media widget otherwise shows "Nothing playing" under the clock on the
+# Go's narrow 1024px-wide logical screen.
+[widget.media]
+type = "media"
+hide_when_no_media = true
+
+# Icons only, except the battery, which keeps its percentage.
+[widget.network]
+type = "network"
+show_label = false
+show_glyph = true
+
+[widget.volume]
+type = "volume"
+show_label = false
+show_glyph = true
+
+[widget.brightness]
+type = "brightness"
+show_label = false
+show_glyph = true
+
+[widget.battery]
+type = "battery"
+show_label = true
+show_glyph = true

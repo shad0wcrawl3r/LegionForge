@@ -1,0 +1,26 @@
+#!/bin/bash
+# LegionForge: make steamos-manager open niri for "Switch to Desktop".
+#
+# OpenGamepadUI (and Steam) ask steamos-manager to switch to desktop mode
+# without naming a session, so steamos-manager uses the per-user
+# desktop_session in ~/.config/steamos-manager/state.toml. That overrides the
+# image default and can still say gnome.desktop from before LegionForge,
+# which no longer exists. Re-assert the wanted session at every login.
+#
+# Override per machine with a session name in /etc/legionforge/desktop-session.
+set -euo pipefail
+
+want="niri.desktop"
+if [[ -r /etc/legionforge/desktop-session ]]; then
+  want="$(tr -d '[:space:]' < /etc/legionforge/desktop-session)"
+fi
+if [[ ! -f "/usr/share/wayland-sessions/${want}" ]]; then
+  echo "legionforge-desktop-session: ${want} is not installed; leaving setting alone" >&2
+  exit 0
+fi
+
+have="$(steamosctl get-default-desktop-session 2>/dev/null || true)"
+if [[ "$have" != "$want" ]]; then
+  steamosctl set-default-desktop-session "$want"
+  echo "legionforge-desktop-session: default desktop ${have:-<unset>} -> ${want}"
+fi

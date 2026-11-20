@@ -45,6 +45,28 @@ check "noctalia is pulled in by niri.service" \
 check "no Noctalia settings shipped (first-run wizard must appear)" \
   "! find /etc/skel /usr/share/noctalia -name settings.toml 2>/dev/null | grep -q ."
 
+check "steamos-manager desktop pinned to niri at login (OpenGamepadUI path)" \
+  "test -x /usr/libexec/legionforge-desktop-session && bash -n /usr/libexec/legionforge-desktop-session && test -L /etc/systemd/user/default.target.wants/legionforge-desktop-session.service"
+
+check "Noctalia defaults ship, are valid, and are seeded before Noctalia starts" \
+  "noctalia config validate /usr/share/legionforge/noctalia/00-legionforge-defaults.toml 2>&1 | grep -q 'Config is valid' && ! noctalia config validate /usr/share/legionforge/noctalia/00-legionforge-defaults.toml 2>&1 | grep -q 'unknown setting' && test -x /usr/libexec/legionforge-noctalia-defaults && grep -q legionforge-noctalia-defaults /usr/lib/systemd/user/noctalia.service.d/10-legionforge-defaults.conf"
+check "Noctalia wizard state not shipped (wizard must appear on first start)" \
+  "! find /etc/skel /usr/share -path '*noctalia*' \\( -name .setup-complete -o -name settings.toml \\) 2>/dev/null | grep -q ."
+check "Bazzite Portal does not autostart for new users" \
+  "test ! -e /etc/skel/.config/autostart/bazzite-portal.desktop"
+
+echo "== GNOME removed, niri essentials kept"
+check "GNOME desktop removed (gdm gnome-shell gnome-session gnome-control-center)" \
+  "for p in gdm gnome-shell gnome-session gnome-control-center; do ! rpm -q \$p; done && test ! -e /usr/share/wayland-sessions/gnome.desktop"
+check "kept: sddm, oo7 password store + PAM unlock, portals, nautilus, VPN dialogs, pinentry, GTK3 theme" \
+  "rpm -q sddm oo7-daemon oo7-portal pam_oo7 xdg-desktop-portal-gnome xdg-desktop-portal-gtk nautilus gnome-disk-utility NetworkManager-openvpn-gnome NetworkManager-openconnect-gnome pinentry-gnome3 adw-gtk3-theme"
+check "unused GNOME pieces removed (mutter, gnome-settings-daemon, evolution-data-server, docs)" \
+  "for p in mutter gnome-settings-daemon evolution-data-server gnome-user-docs gnome-backgrounds gjs; do ! rpm -q \$p; done"
+check "ujust parses and has the LegionForge recipes" \
+  "JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -q restore-noctalia-setup"
+check "no GNOME-only ujust recipes left" \
+  "! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -qE 'restore-gnome-(de-settings|folders)' && ! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --show restore-virtual-keyboard | grep -q gnome-extensions"
+
 echo "== SELinux types vs device policy (${DEVICE_BASE})"
 in_image "cat /etc/selinux/targeted/contexts/files/file_contexts" > "$WORK/file_contexts"
 if ! podman image exists "$DEVICE_BASE"; then

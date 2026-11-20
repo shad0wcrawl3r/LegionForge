@@ -1,10 +1,11 @@
 #!/bin/bash
 # LegionForge: Steam's "Switch to Desktop" calls steamos-session-select, which
 # runs this file in preference to Bazzite's /usr/libexec/os-session-select.
-# Bazzite's version hard-codes gnome.desktop; this one opens niri instead.
+# Bazzite's version hard-codes gnome.desktop (which LegionForge removes); this
+# one opens niri instead.
 #
-# Override per machine by writing a session name (e.g. "gnome.desktop") to
-# /etc/legionforge/desktop-session.
+# Override per machine by writing a session name (a file in
+# /usr/share/wayland-sessions/) to /etc/legionforge/desktop-session.
 
 set -e
 
@@ -15,10 +16,14 @@ override=/etc/legionforge/desktop-session
 if [[ -r "$override" ]]; then
   desktop_session="$(tr -d '[:space:]' < "$override")"
 fi
-# Never strand the user: fall back to GNOME if the chosen session is missing.
-if [[ ! -f "/usr/share/wayland-sessions/${desktop_session}" ]]; then
-  echo >&2 "!! ${desktop_session} not found, falling back to gnome.desktop"
-  desktop_session="gnome.desktop"
+# GNOME is not installed, so there is no other desktop to fall back to. If the
+# chosen session is missing, stay in Gaming Mode instead of starting a broken
+# desktop session (recover by rolling back to the previous deployment).
+if [[ ! -f "/usr/share/wayland-sessions/${desktop_session}" && "$session" != gamescope ]]; then
+  echo >&2 "!! ${desktop_session} not found; staying in Gaming Mode"
+  steamosctl set-default-login-mode game
+  steamosctl switch-to-game-mode
+  exit 1
 fi
 
 case "$session" in
