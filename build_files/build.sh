@@ -43,10 +43,31 @@ KEEP=(
     sddm
     oo7-daemon oo7-portal pam_oo7
     xdg-desktop-portal-gnome xdg-desktop-portal-gtk
-    nautilus
+    nautilus gnome-disk-utility
+    NetworkManager-openvpn-gnome NetworkManager-openconnect-gnome
+    pinentry-gnome3 adw-gtk3-theme
 )
 dnf5 mark -y user "${KEEP[@]}"
-dnf5 remove -y \
+
+# Remove exactly the listed packages. dnf would silently remove anything that
+# depends on them too, so fail the build if the removed set differs from the
+# list (the dependency analysis behind these lists: see the GNOME dependency
+# graph linked from CONTRIBUTING.md).
+remove_exactly() {
+    local before after removed
+    before="$(rpm -qa --qf '%{NAME}\n' | sort -u)"
+    dnf5 remove -y "$@"
+    after="$(rpm -qa --qf '%{NAME}\n' | sort -u)"
+    removed="$(comm -23 <(echo "$before") <(echo "$after"))"
+    if [[ "$removed" != "$(printf '%s\n' "$@" | sort -u)" ]]; then
+        echo "remove_exactly: dnf removed a different set than requested:" >&2
+        diff <(printf '%s\n' "$@" | sort -u) <(echo "$removed") >&2 || true
+        exit 1
+    fi
+}
+
+# Stage 1: the GNOME desktop itself.
+remove_exactly \
     gdm \
     gnome-shell \
     gnome-session \
@@ -61,6 +82,32 @@ dnf5 remove -y \
     gnome-remote-desktop \
     gnome-user-share \
     steamdeck-gnome-presets
+
+# Stage 2: GNOME pieces nothing outside GNOME requires any more (~155 MB).
+# Deliberately kept despite having no dependents: NetworkManager-openvpn-gnome,
+# NetworkManager-openconnect-gnome and libnma* (VPN auth dialogs),
+# pinentry-gnome3 (GUI GPG passphrase prompt) and adw-gtk3-theme (GTK3 theme).
+remove_exactly \
+    gnome-user-docs \
+    gnome-backgrounds desktop-backgrounds-gnome \
+    f45-backgrounds-gnome f45-backgrounds-gnome-time-of-day \
+    evolution-data-server evolution-data-server-langpacks \
+    evolution-ews-core evolution-ews-langpacks \
+    gnome-online-accounts \
+    mutter mutter-common \
+    gnome-settings-daemon \
+    gjs \
+    gnome-bluetooth gnome-bluetooth-libs \
+    gnome-color-manager \
+    gnome-menus \
+    gnome-app-list \
+    gnome-shell-common \
+    gnome-control-center-filesystem \
+    gnome-epub-thumbnailer \
+    nautilus-python \
+    papers-nautilus \
+    fedora-chromium-config-gnome
+
 rpm -q "${KEEP[@]}"
 test ! -e /usr/share/wayland-sessions/gnome.desktop
 
