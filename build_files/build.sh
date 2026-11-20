@@ -44,3 +44,14 @@ grep -qx 'desktop = "niri.desktop"' /usr/share/steamos-manager/platform.toml
 #### Example for enabling a System Unit File
 
 systemctl enable podman.socket
+
+#### Noctalia: start automatically in niri sessions
+# Use the systemd user unit Noctalia ships as a template, so it tracks
+# upstream. It is pulled in by niri.service only, never by GNOME or Gaming
+# Mode. No settings are shipped: on first start Noctalia runs its setup
+# wizard and saves choices to ~/.config/noctalia/settings.toml.
+# Opt out per user: systemctl --user mask noctalia.service
+install -Dm0644 /usr/share/noctalia/assets/noctalia.service \
+    /usr/lib/systemd/user/noctalia.service
+mkdir -p /usr/lib/systemd/user/niri.service.wants
+ln -sf ../noctalia.service /usr/lib/systemd/user/niri.service.wants/noctalia.service
