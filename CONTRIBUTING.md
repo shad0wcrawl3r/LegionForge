@@ -50,6 +50,24 @@ checks:
 If you change the base variant in `Containerfile`, check what the device runs
 (`bootc status`) and update `DEVICE_BASE_IMAGE` to match.
 
+## Installer ISO (manual only)
+
+The ISO is never built automatically. Build one from the Actions tab
+(**Build installer ISO** → **Run workflow**) or with:
+
+```sh
+gh workflow run build-disk.yml            # from :latest
+gh workflow run build-disk.yml -f tag=latest-20261120-abc1234
+gh run watch                              # follow it; the summary shows the ISO size
+gh run download <run-id> -n legionforge-iso
+```
+
+The workflow refuses to build from an image that isn't signed with `cosign.pub`.
+The ISO and its `SHA256SUMS` stay on the run for 7 days. Nothing is published.
+The installer asks for a user account and time zone. It then points the installed system at
+`ghcr.io/shad0wcrawl3r/legionforge:latest` with signature checking turned on.
+`just build-iso` builds the same ISO locally on an x86 Linux machine with podman.
+
 ## Signing key
 
 Images are signed with cosign. `cosign.pub` is committed; the private key is the
