@@ -1,0 +1,16 @@
+#!/bin/bash
+# Legix: install the image's Noctalia defaults into the user's config dir.
+# Noctalia merges every *.toml in ~/.config/noctalia (it does not read
+# XDG_CONFIG_DIRS), and both the user's own files and the Settings UI state
+# (~/.local/state/noctalia/settings.toml) override these defaults.
+set -euo pipefail
+src=/usr/share/legix/noctalia/00-legix-defaults.toml
+dir="${XDG_CONFIG_HOME:-$HOME/.config}/noctalia"
+[[ -e "$dir/.legix-no-defaults" || -e "$dir/.legionforge-no-defaults" ]] && exit 0
+mkdir -p "$dir"
+# Before the rename to Legix this file was 00-legionforge-defaults.toml.
+# Noctalia merges every *.toml here, so the old copy must go.
+rm -f "$dir/00-legionforge-defaults.toml"
+if ! cmp -s "$src" "$dir/00-legix-defaults.toml"; then
+  install -m 0644 "$src" "$dir/00-legix-defaults.toml"
+fi

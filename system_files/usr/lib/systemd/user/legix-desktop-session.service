@@ -1,0 +1,12 @@
+[Unit]
+Description=Legix: open niri from Switch to Desktop
+Documentation=https://github.com/shad0wcrawl3r/legix
+After=steamos-manager.service
+Wants=steamos-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/legix-desktop-session
+
+[Install]
+WantedBy=default.target

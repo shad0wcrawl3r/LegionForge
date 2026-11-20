@@ -14,7 +14,7 @@
    branch is deleted automatically.
 
 Every merge to `main` triggers a signed image build at
-`ghcr.io/shad0wcrawl3r/legionforge`, so treat merging as releasing.
+`ghcr.io/shad0wcrawl3r/legix`, so treat merging as releasing.
 
 ## Commit / PR title types
 
@@ -40,7 +40,7 @@ to act (e.g. `feat!: switch base to bazzite-deck-gnome`).
 keyboard check. Without the feature, a keyboardless Go can't unlock its desktop. Any change to
 how Noctalia is installed must keep both.
 
-LegionForge ships Noctalia with upstream PR #5233 (the lock-screen on-screen keyboard).
+Legix ships Noctalia with upstream PR #5233 (the lock-screen on-screen keyboard).
 The RPM is built and released by
 [shad0wcrawl3r/noctalia-osk](https://github.com/shad0wcrawl3r/noctalia-osk), once per
 Fedora noctalia version. CI downloads it with `.github/scripts/fetch-noctalia.sh`,
@@ -74,7 +74,7 @@ If you change the base variant in `Containerfile`, check what the device runs
 
 ## Installer ISO (not distributed)
 
-LegionForge doesn't build or publish installer ISOs. Users install Bazzite and then
+Legix doesn't build or publish installer ISOs. Users install Bazzite and then
 `bootc switch` (see README). A CI ISO build existed briefly. It was dropped on 2026-11-20,
 after the first ISO came out at 5.82 GiB, too big to host on a free tier.
 
@@ -85,6 +85,22 @@ after the first ISO came out at 5.82 GiB, too big to host on a free tier.
   image that copies `fedora.repo` and `fedora-updates.repo` into `/etc/yum.repos.d`.
 - **Ubuntu 26.04 hosts:** osbuild fails there with
   `mount: /run/osbuild/tree/dev: permission denied`, but works on Ubuntu 24.04.
+
+## Branding
+
+Legix's name and logo replace Bazzite's wherever the system shows them, and stay out of the
+places Bazzite's own tools rely on. `build.sh` (*Legix branding*) does this:
+- **os-release:** `NAME`, `PRETTY_NAME`, `LOGO=legix-logo`, the URLs, `BOOTLOADER_NAME` and
+  `DEFAULT_HOSTNAME`. `ID` stays `bazzite` on purpose, because ujust, updates and helpers
+  check it.
+- **image-info.json:** the image name and ref.
+- **Logo:** the `legix-logo` icon in every size, rendered from `branding/legix-mark.svg`.
+  Bazzite's `logo.svg`, `logo.txt` (fastfetch) and `updatelogo.png` are swapped for Legix's.
+- **Terminal:** fastfetch colours, and the welcome banner.
+- **Boot animation:** the Plymouth theme.
+
+Links to Bazzite's docs and community are kept and labelled as Legix's base. The smoke
+test checks all of the above.
 
 ## Signing key
 

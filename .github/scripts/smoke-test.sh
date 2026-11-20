@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Smoke-test the built LegionForge image before it is pushed.
+# Smoke-test the built Legix image before it is pushed.
 #
 # Usage: smoke-test.sh <built-image> <device-base-image>
-#   <built-image>        local image to test, e.g. localhost/legionforge:latest
+#   <built-image>        local image to test, e.g. localhost/legix:latest
 #   <device-base-image>  the image the Legion Go switches/upgrades FROM. Every
 #                        SELinux type the built image labels files with must
 #                        already exist in this image's compiled policy, or
@@ -46,20 +46,20 @@ check "no Noctalia settings shipped (first-run wizard must appear)" \
   "! find /etc/skel /usr/share/noctalia -name settings.toml 2>/dev/null | grep -q ."
 
 check "steamos-manager desktop pinned to niri at login (OpenGamepadUI path)" \
-  "test -x /usr/libexec/legionforge-desktop-session && bash -n /usr/libexec/legionforge-desktop-session && test -L /etc/systemd/user/default.target.wants/legionforge-desktop-session.service"
+  "test -x /usr/libexec/legix-desktop-session && bash -n /usr/libexec/legix-desktop-session && test -L /etc/systemd/user/default.target.wants/legix-desktop-session.service"
 
 check "Noctalia defaults ship, are valid, and are seeded before Noctalia starts" \
-  "noctalia config validate /usr/share/legionforge/noctalia/00-legionforge-defaults.toml 2>&1 | grep -q 'Config is valid' && ! noctalia config validate /usr/share/legionforge/noctalia/00-legionforge-defaults.toml 2>&1 | grep -q 'unknown setting' && test -x /usr/libexec/legionforge-noctalia-defaults && grep -q legionforge-noctalia-defaults /usr/lib/systemd/user/noctalia.service.d/10-legionforge-defaults.conf"
+  "noctalia config validate /usr/share/legix/noctalia/00-legix-defaults.toml 2>&1 | grep -q 'Config is valid' && ! noctalia config validate /usr/share/legix/noctalia/00-legix-defaults.toml 2>&1 | grep -q 'unknown setting' && test -x /usr/libexec/legix-noctalia-defaults && grep -q legix-noctalia-defaults /usr/lib/systemd/user/noctalia.service.d/10-legix-defaults.conf"
 check "Noctalia wizard state not shipped (wizard must appear on first start)" \
   "! find /etc/skel /usr/share -path '*noctalia*' \\( -name .setup-complete -o -name settings.toml \\) 2>/dev/null | grep -q ."
 check "Bazzite Portal does not autostart for new users" \
   "test ! -e /etc/skel/.config/autostart/bazzite-portal.desktop"
 
 check "desk security: Noctalia lock with its on-screen keyboard; Gaming Mode in the power menu" \
-  "test -x /usr/libexec/legionforge-away && bash -n /usr/libexec/legionforge-away && test ! -e /usr/lib/systemd/user/niri.service.wants/legionforge-away-on-resume.service && test ! -e /usr/lib/systemd/user/legionforge-away-on-resume.service && grep -qx 'lock_before_suspend = true' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -qx 'keyboard = \"auto\"' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -A3 '^\\[idle.behavior.lock\\]' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml | grep -q 'enabled = true' && grep -q 'Gaming Mode (Steam PIN)' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml"
+  "test -x /usr/libexec/legix-away && bash -n /usr/libexec/legix-away && test ! -e /usr/lib/systemd/user/niri.service.wants/legix-away-on-resume.service && test ! -e /usr/lib/systemd/user/legix-away-on-resume.service && grep -qx 'lock_before_suspend = true' /usr/share/legix/noctalia/00-legix-defaults.toml && grep -qx 'keyboard = \"auto\"' /usr/share/legix/noctalia/00-legix-defaults.toml && grep -A3 '^\\[idle.behavior.lock\\]' /usr/share/legix/noctalia/00-legix-defaults.toml | grep -q 'enabled = true' && grep -q 'Gaming Mode (Steam PIN)' /usr/share/legix/noctalia/00-legix-defaults.toml"
 
 check "on-screen keyboard: plugin enabled and on the bar by default" \
-  "grep -q 'enabled = \\[ .omerfuyar/keyboard. \\]' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -q 'omerfuyar/keyboard:widget' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -qE '^ +.osk.,$' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml"
+  "grep -q 'enabled = \\[ .omerfuyar/keyboard. \\]' /usr/share/legix/noctalia/00-legix-defaults.toml && grep -q 'omerfuyar/keyboard:widget' /usr/share/legix/noctalia/00-legix-defaults.toml && grep -qE '^ +.osk.,$' /usr/share/legix/noctalia/00-legix-defaults.toml"
 
 check "Noctalia lock screen has the on-screen keyboard (lockscreen.keyboard setting)" \
   "printf '[lockscreen]\\nkeyboard = \"auto\"\\n' > /tmp/osk.toml && noctalia config validate /tmp/osk.toml 2>&1 | grep -q 'Config is valid' && ! noctalia config validate /tmp/osk.toml 2>&1 | grep -q 'unknown setting'"
@@ -73,7 +73,7 @@ check "unused GNOME pieces removed (mutter, gnome-settings-daemon, evolution-dat
   "for p in mutter gnome-settings-daemon evolution-data-server gnome-user-docs gnome-backgrounds gjs; do ! rpm -q \$p; done"
 check "no leftover GNOME Shell extensions" \
   "test ! -e /usr/share/gnome-shell/extensions"
-check "ujust parses and has the LegionForge recipes" \
+check "ujust parses and has the Legix recipes" \
   "JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -q restore-noctalia-setup"
 check "no GNOME-only ujust recipes left" \
   "! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -qE 'restore-gnome-(de-settings|folders)' && ! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --show restore-virtual-keyboard | grep -q gnome-extensions"
@@ -85,14 +85,27 @@ check "initramfs carries the Legix theme, the script plugin and ostree" \
   "i=\$(ls /usr/lib/modules/*/initramfs.img) && l=\$(lsinitrd \"\$i\") && grep -q 'plymouth/themes/legix/legix.script' <<< \"\$l\" && grep -q 'plymouth/script.so' <<< \"\$l\" && grep -q 'ostree-prepare-root' <<< \"\$l\""
 
 echo "== Image signature trust"
-check "policy.json trusts ghcr.io/shad0wcrawl3r/legionforge via sigstore + registries.d attachments" \
-  "jq -e '.transports.docker[\"ghcr.io/shad0wcrawl3r/legionforge\"][0] | .type == \"sigstoreSigned\" and .keyPath == \"/etc/pki/containers/legionforge.pub\"' /etc/containers/policy.json && grep -q 'use-sigstore-attachments: true' /etc/containers/registries.d/legionforge.yaml && jq -e '.transports.docker[\"ghcr.io/ublue-os\"]' /etc/containers/policy.json"
-if cmp -s <(in_image "cat /etc/pki/containers/legionforge.pub") cosign.pub; then
+check "policy.json trusts ghcr.io/shad0wcrawl3r/legix via sigstore + registries.d attachments" \
+  "jq -e '.transports.docker[\"ghcr.io/shad0wcrawl3r/legix\"][0] | .type == \"sigstoreSigned\" and .keyPath == \"/etc/pki/containers/legix.pub\"' /etc/containers/policy.json && grep -q 'use-sigstore-attachments: true' /etc/containers/registries.d/legix.yaml && jq -e '.transports.docker[\"ghcr.io/ublue-os\"]' /etc/containers/policy.json"
+if cmp -s <(in_image "cat /etc/pki/containers/legix.pub") cosign.pub; then
   echo "ok   - shipped signing key matches cosign.pub"
 else
-  echo "::error title=Smoke test::shipped /etc/pki/containers/legionforge.pub differs from cosign.pub"
+  echo "::error title=Smoke test::shipped /etc/pki/containers/legix.pub differs from cosign.pub"
   fail=1
 fi
+
+check "pre-rename name ghcr.io/shad0wcrawl3r/legionforge still trusted (same key) during the move" \
+  "jq -e '.transports.docker[\"ghcr.io/shad0wcrawl3r/legionforge\"][0] | .type == \"sigstoreSigned\" and .keyPath == \"/etc/pki/containers/legix.pub\"' /etc/containers/policy.json && grep -q 'ghcr.io/shad0wcrawl3r/legionforge:' /etc/containers/registries.d/legix.yaml"
+
+echo "== Legix branding"
+check "os-release says Legix (ID stays bazzite for Bazzite's tools) with the Legix logo icon" \
+  "grep -qx 'NAME=\"Legix\"' /usr/lib/os-release && grep -qx 'PRETTY_NAME=\"Legix\"' /usr/lib/os-release && grep -qx 'ID=bazzite' /usr/lib/os-release && grep -qx 'LOGO=legix-logo' /usr/lib/os-release && test -s /usr/share/icons/hicolor/scalable/apps/legix-logo.svg && test -s /usr/share/icons/hicolor/256x256/apps/legix-logo.png"
+check "image-info, fastfetch logo and welcome banner are Legix" \
+  "jq -e '.\"image-name\" == \"legix\" and (.\"image-ref\" | endswith(\"ghcr.io/shad0wcrawl3r/legix\"))' /usr/share/ublue-os/image-info.json && grep -q '38;2;229;67;45' /usr/share/ublue-os/bazzite/fastfetch.jsonc && cmp -s /usr/share/ublue-os/bazzite/logo.svg /usr/share/icons/hicolor/scalable/apps/legix-logo.svg && grep -q '^# .*Legix' /usr/share/ublue-os/motd/template.md && grep -q '^Legix' /etc/system-release"
+check "no Bazzite name left in os-release display fields" \
+  "! grep -E '^(NAME|PRETTY_NAME|BOOTLOADER_NAME|DEFAULT_HOSTNAME|LOGO)=' /usr/lib/os-release | grep -qi bazzite"
+check "pre-rename paths still work (away script link, seeder removes the old defaults file)" \
+  "test \"\$(readlink /usr/libexec/legionforge-away)\" = legix-away && grep -q 'rm -f \"\$dir/00-legionforge-defaults.toml\"' /usr/libexec/legix-noctalia-defaults"
 
 echo "== SELinux types vs device policy (${DEVICE_BASE})"
 in_image "cat /etc/selinux/targeted/contexts/files/file_contexts" > "$WORK/file_contexts"
@@ -123,7 +136,7 @@ def defined(name):
 
 # Self-test, so a policy format change can't make this check silently
 # pass (or fail) everything.
-if not defined("bin_t") or defined("legionforge_selftest_nonexistent_t"):
+if not defined("bin_t") or defined("legix_selftest_nonexistent_t"):
     print("::error title=SELinux check self-test failed::cannot parse the device policy; update smoke-test.sh")
     sys.exit(1)
 if len(types) < 100:

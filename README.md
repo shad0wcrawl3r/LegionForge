@@ -1,12 +1,16 @@
-# LegionForge
+# Legix
 
-LegionForge is a custom [Bazzite](https://bazzite.gg) image for handheld gaming PCs. It is built
+<p align="center"><img src="branding/legix-mark.svg" width="140" alt="Legix logo: a red visor with L-shaped fins and an ember gem"></p>
+
+*Formerly LegionForge.*
+
+Legix is a custom [Bazzite](https://bazzite.gg) image for handheld gaming PCs. It is built
 for the original **Lenovo Legion Go** (Z1 Extreme). Gaming Mode is the same as stock Bazzite.
 Desktop Mode is **[niri](https://github.com/YaLTeR/niri)**, a scrolling tiling Wayland
 compositor, with the **[Noctalia](https://noctalia.dev)** shell.
 
 - **Base:** `ghcr.io/ublue-os/bazzite-deck-gnome:stable`, rebuilt every day, so you get Bazzite
-  and Fedora updates through LegionForge.
+  and Fedora updates through Legix.
 - **Desktop:** niri and Noctalia, from the official Fedora repositories (no COPRs). The one
   exception is Noctalia itself, see below. The GNOME desktop is removed.
 - **Signed:** every image is signed with cosign, and the device checks the signature on
@@ -14,22 +18,22 @@ compositor, with the **[Noctalia](https://noctalia.dev)** shell.
 
 ## Required: Noctalia with the lock-screen keyboard
 
-LegionForge requires a Noctalia build whose lock screen has an on-screen keyboard. The
+Legix requires a Noctalia build whose lock screen has an on-screen keyboard. The
 Legion Go is often used without a physical keyboard, and without this a locked desktop
 can't be unlocked at all. Fedora's noctalia doesn't have the feature yet (upstream PR
 [noctalia-dev/noctalia#5233](https://github.com/noctalia-dev/noctalia/pull/5233)).
 
 - **Where it comes from:** [shad0wcrawl3r/noctalia-osk](https://github.com/shad0wcrawl3r/noctalia-osk)
-  rebuilds Fedora's package with that patch, and LegionForge installs its signed-provenance
+  rebuilds Fedora's package with that patch, and Legix installs its signed-provenance
   releases.
 - **Enforced by the build:** if the build can't get a verified release, or the result lacks
   the lock-screen keyboard, it fails and no image is published.
 - **When the patch retires:** once Fedora's noctalia includes the feature, noctalia-osk
-  publishes a release saying so, and LegionForge goes back to Fedora's package.
+  publishes a release saying so, and Legix goes back to Fedora's package.
 
 ## What's different from stock Bazzite
 
-| | Stock Bazzite (Deck, GNOME) | LegionForge |
+| | Stock Bazzite (Deck, GNOME) | Legix |
 |---|---|---|
 | Gaming Mode | Steam via OpenGamepadUI | Same |
 | Switch to Desktop | GNOME | niri with the Noctalia shell |
@@ -46,7 +50,7 @@ them.
 ## Install
 
 You need a device that already runs **Bazzite Deck with GNOME** (`bazzite-deck-gnome`).
-Switching to LegionForge keeps your games, Steam library, Flatpaks, saves and settings,
+Switching to Legix keeps your games, Steam library, Flatpaks, saves and settings,
 because it only replaces the operating system, not your home folder.
 
 > [!IMPORTANT]
@@ -79,10 +83,10 @@ Pin your current system so it stays in the boot menu as a fallback:
 sudo ostree admin pin 0
 ```
 
-### 4. Switch to LegionForge
+### 4. Switch to Legix
 
 ```sh
-sudo bootc switch ghcr.io/shad0wcrawl3r/legionforge:latest
+sudo bootc switch ghcr.io/shad0wcrawl3r/legix:latest
 systemctl reboot
 ```
 
@@ -91,18 +95,18 @@ changed.
 
 ### 5. Turn on signature checking
 
-Your old system didn't know LegionForge's signing key, so the first switch can't check the
-signature. Now that LegionForge is running, it does. Switch again with signature checking
+Your old system didn't know Legix's signing key, so the first switch can't check the
+signature. Now that Legix is running, it does. Switch again with signature checking
 turned on. This downloads nothing new:
 
 ```sh
-sudo bootc switch --enforce-container-sigpolicy ghcr.io/shad0wcrawl3r/legionforge:latest
+sudo bootc switch --enforce-container-sigpolicy ghcr.io/shad0wcrawl3r/legix:latest
 systemctl reboot
 ```
 
-From then on, the device refuses any update that isn't signed with LegionForge's key
+From then on, the device refuses any update that isn't signed with Legix's key
 ([`cosign.pub`](cosign.pub)). `rpm-ostree status` then shows the image as
-`ostree-image-signed:docker://ghcr.io/shad0wcrawl3r/legionforge:latest`, the same way stock Bazzite
+`ostree-image-signed:docker://ghcr.io/shad0wcrawl3r/legix:latest`, the same way stock Bazzite
 shows its own image.
 
 ### 6. Set up locking
@@ -135,6 +139,19 @@ shows its own image.
 | `ujust restore-noctalia-setup` | Back up your Noctalia settings and run its setup wizard again |
 | `ujust niri-validate` | Check your niri config for errors |
 
+## Moving from LegionForge
+
+The project and its image were renamed on 2026-11-20. Images are still published as
+`ghcr.io/shad0wcrawl3r/legionforge` for now, so existing installs keep updating. Move over in
+two steps. The first update teaches the device to trust the new name:
+
+```sh
+sudo bootc upgrade && systemctl reboot
+sudo bootc switch --enforce-container-sigpolicy ghcr.io/shad0wcrawl3r/legix:latest && systemctl reboot
+```
+
+The old name stops getting updates after 2027-01-31.
+
 ## Updates
 
 Updates install automatically in the background, like on stock Bazzite. To update now:
@@ -166,6 +183,12 @@ and commit conventions, and for the smoke test every build runs.
 
 ## Credits
 
-Built on [Universal Blue](https://universal-blue.org)'s
-[image-template](https://github.com/ublue-os/image-template) and
-[Bazzite](https://github.com/ublue-os/bazzite). Licensed under Apache 2.0.
+Legix is based on [Bazzite](https://bazzite.gg) ([source](https://github.com/ublue-os/bazzite)),
+built with [Universal Blue](https://universal-blue.org)'s
+[image-template](https://github.com/ublue-os/image-template). It keeps Bazzite's Gaming Mode,
+updates and tools; the name, logo and boot animation are Legix's own. Bazzite's docs and
+community still cover most of the system. Licensed under Apache 2.0.
+
+Legix is an independent project. It isn't affiliated with or endorsed by Lenovo, Valve or
+the Bazzite project. "Legion Go" is a trademark of Lenovo, used here only to name the
+hardware Legix supports.

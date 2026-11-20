@@ -1,6 +1,8 @@
 # Legix brand assets
 
 - `legix-mark.svg`: the logo (V5, "visor with L fins"). viewBox 0 0 200 200.
+- `legix-logo.txt`: the mark as fastfetch ASCII art (colour slots `$1` visor, `$2` fins,
+  `$3`/`$4` gem).
 - `legix-wordmark.svg`: "LEGIX" in Chakra Petch Bold, outlined to paths (no font needed).
 - `plymouth/`: the logo split into the parts the boot animation moves (`l-left`,
   `l-right`, `v`, `gem`, `gem-glow`), each on the same 200×200 canvas, plus the
