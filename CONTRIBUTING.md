@@ -34,6 +34,22 @@ Subjects are imperative, lowercase, no trailing period:
 `feat: add niri and noctalia shell`. Append `!` for changes that need users
 to act (e.g. `feat!: switch base to bazzite-deck-gnome`).
 
+## Smoke test
+
+Every build runs `.github/scripts/smoke-test.sh` before anything is pushed. It
+checks:
+
+- the expected packages are installed;
+- Switch to Desktop opens niri, and Noctalia is set to start with it;
+- no Noctalia settings are shipped, so the first-run wizard appears;
+- every SELinux type in the image already exists in the policy of
+  `DEVICE_BASE_IMAGE` (set in `build.yml`). That is the image the Legion Go
+  switches or upgrades from. If the check fails, `bootc switch` would fail
+  on the device with `fsetxattr(security.selinux): Invalid argument`.
+
+If you change the base variant in `Containerfile`, check what the device runs
+(`bootc status`) and update `DEVICE_BASE_IMAGE` to match.
+
 ## Signing key
 
 Images are signed with cosign. `cosign.pub` is committed; the private key is the
