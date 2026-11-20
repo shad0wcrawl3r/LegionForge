@@ -1,18 +1,12 @@
-# Noctalia with the lock-screen on-screen keyboard (upstream PR #5233), built
-# from Fedora's own source package. Produces no RPMs (and the repo package is
-# used) once Fedora's noctalia already includes the feature.
-FROM registry.fedoraproject.org/fedora:45 AS noctalia-osk
-COPY patches /patches
-COPY build_files/noctalia-osk/build-noctalia.sh /build-noctalia.sh
-RUN --mount=type=cache,dst=/var/cache/libdnf5 /build-noctalia.sh
-
 # Allow build scripts to be referenced without being copied into the final image
 FROM scratch AS ctx
 COPY build_files /
 COPY system_files /system_files
 # Public half of the image signing key, installed so devices can verify updates.
 COPY cosign.pub /cosign.pub
-COPY --from=noctalia-osk /out /noctalia-rpms
+# Patched Noctalia RPM (lock-screen on-screen keyboard), built separately and
+# cached by CI from build_files/noctalia-osk/Containerfile. Empty = Fedora's.
+COPY noctalia-rpms /noctalia-rpms
 
 # Base Image
 FROM ghcr.io/ublue-os/bazzite-deck-gnome:stable

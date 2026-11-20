@@ -34,6 +34,21 @@ Subjects are imperative, lowercase, no trailing period:
 `feat: add niri and noctalia shell`. Append `!` for changes that need users
 to act (e.g. `feat!: switch base to bazzite-deck-gnome`).
 
+## Patched Noctalia (lock-screen keyboard)
+
+LegionForge ships Noctalia with upstream PR #5233 (`patches/`). Compiling it takes
+about 70 minutes, so CI caches the RPM, keyed on Fedora's noctalia version and on
+`patches/` and `build_files/noctalia-osk/`. It's rebuilt only when one of those
+changes. For a local `just build` with the patch, build the RPM first:
+
+```sh
+podman build -f build_files/noctalia-osk/Containerfile -t noctalia-osk .
+podman cp "$(podman create noctalia-osk):/out/." noctalia-rpms/
+```
+
+Without it, the image uses Fedora's noctalia, and the smoke test's lock-screen
+keyboard check fails.
+
 ## Smoke test
 
 Every build runs `.github/scripts/smoke-test.sh` before anything is pushed. It
