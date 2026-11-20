@@ -55,8 +55,8 @@ check "Noctalia wizard state not shipped (wizard must appear on first start)" \
 check "Bazzite Portal does not autostart for new users" \
   "test ! -e /etc/skel/.config/autostart/bazzite-portal.desktop"
 
-check "desk security: away-to-Gaming-Mode wired, never auto-locks niri (no keyboard)" \
-  "test -x /usr/libexec/legionforge-away && bash -n /usr/libexec/legionforge-away && test \"\$(readlink -f /usr/lib/systemd/user/niri.service.wants/legionforge-away-on-resume.service)\" = /usr/lib/systemd/user/legionforge-away-on-resume.service && test ! -e /usr/lib/systemd/user/niri.service.wants/legionforge-lock-on-desktop.service && grep -qx 'lock_before_suspend = false' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -A3 '^\[idle.behavior.lock\]' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml | grep -q 'enabled = false'"
+check "desk security: Noctalia lock with its on-screen keyboard; Gaming Mode in the power menu" \
+  "test -x /usr/libexec/legionforge-away && bash -n /usr/libexec/legionforge-away && test ! -e /usr/lib/systemd/user/niri.service.wants/legionforge-away-on-resume.service && test ! -e /usr/lib/systemd/user/legionforge-away-on-resume.service && grep -qx 'lock_before_suspend = true' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -qx 'keyboard = \"auto\"' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -A3 '^\\[idle.behavior.lock\\]' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml | grep -q 'enabled = true' && grep -q 'Gaming Mode (Steam PIN)' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml"
 
 check "on-screen keyboard: plugin enabled and on the bar by default" \
   "grep -q 'enabled = \\[ .omerfuyar/keyboard. \\]' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -q 'omerfuyar/keyboard:widget' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -qE '^ +.osk.,$' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml"

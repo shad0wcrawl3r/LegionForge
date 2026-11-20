@@ -66,25 +66,28 @@ type = "battery"
 show_label = true
 show_glyph = true
 
-# Desk security without a keyboard (LFORGE-15): Noctalia's lock screen needs a
-# physical keyboard for the password, so the "lock" is Steam's lock-screen PIN
-# in Gaming Mode instead. Never lock niri itself: no lock before suspend, the
-# idle lock stays off, and idle / Lock / Suspend go to Gaming Mode.
+# Desk security (LFORGE-15/18): Noctalia's own lock screen, which has an
+# on-screen keyboard (lockscreen.keyboard, from noctalia-osk), so it can be
+# unlocked without a physical keyboard. It locks before suspend and after
+# 5 min idle. "Gaming Mode (Steam PIN)" replaces Logout, which went to
+# Gaming Mode anyway.
 [lockscreen]
-lock_before_suspend = false
+lock_before_suspend = true
+keyboard = "auto"
 
 [idle]
-behavior_order = [ "away", "lock", "screen-off", "lock-and-suspend" ]
+behavior_order = [ "lock", "away", "screen-off", "lock-and-suspend" ]
+
+[idle.behavior.lock]
+action = "lock"
+enabled = true
+timeout = 300.0
 
 [idle.behavior.away]
 action = "command"
 command = "/usr/libexec/legionforge-away"
-enabled = true
-timeout = 300.0
-
-[idle.behavior.lock]
-action = "lock"
 enabled = false
+timeout = 300.0
 
 [idle.behavior.lock-and-suspend]
 action = "lock_and_suspend"
@@ -92,17 +95,16 @@ enabled = false
 
 [[shell.session.actions]]
 action = "lock"
-command = "/usr/libexec/legionforge-away"
-label = "Lock (Gaming Mode)"
 shortcut = "1"
 
 [[shell.session.actions]]
 action = "logout"
+command = "/usr/libexec/legionforge-away"
+label = "Gaming Mode (Steam PIN)"
 shortcut = "2"
 
 [[shell.session.actions]]
 action = "suspend"
-command = "/usr/libexec/legionforge-away --suspend"
 label = "Lock and suspend"
 shortcut = "3"
 

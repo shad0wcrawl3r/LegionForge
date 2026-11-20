@@ -1,7 +1,8 @@
 #!/bin/bash
 # LegionForge "away" action: leave the niri desktop for Gaming Mode, where
 # Steam's lock-screen PIN (controller-friendly number pad) guards the device.
-# Used instead of Noctalia's lock screen, which needs a physical keyboard.
+# Offered in Noctalia's power menu as "Gaming Mode (Steam PIN)" and as
+# `ujust away`; the desktop's own lock is Noctalia's lock screen.
 #   legionforge-away            switch to Gaming Mode
 #   legionforge-away --suspend  switch to Gaming Mode, then suspend
 set -euo pipefail
