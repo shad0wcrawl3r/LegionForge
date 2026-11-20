@@ -82,6 +82,20 @@ jobs:
             ${IMAGE_NAME} \
             ${DEFAULT_TAG}
 
+      # Fails the build (so nothing is pushed) if packages or session wiring
+      # are missing, or if the image uses SELinux types the Legion Go's
+      # current policy doesn't know (bootc switch would fail on the device).
+      - name: Smoke test image
+        id: smoke-test
+        env:
+          # The image the device switches/upgrades from. Keep in sync with
+          # the device's variant (see CONTRIBUTING.md).
+          DEVICE_BASE_IMAGE: ghcr.io/ublue-os/bazzite-deck-gnome:stable
+        run: |
+          .github/scripts/smoke-test.sh \
+            "localhost/${IMAGE_NAME}:${DEFAULT_TAG}" \
+            "${DEVICE_BASE_IMAGE}"
+
       # If you are feeling adventurous, use the new distro agnostic rechunker
       # https://github.com/coreos/chunkah
       # You can delete the Rechunk with rpm-ostree portion then if you use this
