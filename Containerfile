@@ -4,8 +4,8 @@ COPY build_files /
 COPY system_files /system_files
 # Public half of the image signing key, installed so devices can verify updates.
 COPY cosign.pub /cosign.pub
-# Patched Noctalia RPM (lock-screen on-screen keyboard), built separately and
-# cached by CI from build_files/noctalia-osk/Containerfile. Empty = Fedora's.
+# Patched Noctalia RPM (lock-screen on-screen keyboard), released by
+# shad0wcrawl3r/noctalia-osk and fetched by CI. Empty = Fedora's package.
 COPY noctalia-rpms /noctalia-rpms
 
 # Base Image

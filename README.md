@@ -7,10 +7,25 @@ compositor, with the **[Noctalia](https://noctalia.dev)** shell.
 
 - **Base:** `ghcr.io/ublue-os/bazzite-deck-gnome:stable`, rebuilt every day, so you get Bazzite
   and Fedora updates through LegionForge.
-- **Desktop:** niri and Noctalia, from the official Fedora repositories (no COPRs). The GNOME
-  desktop is removed.
+- **Desktop:** niri and Noctalia, from the official Fedora repositories (no COPRs). The one
+  exception is Noctalia itself, see below. The GNOME desktop is removed.
 - **Signed:** every image is signed with cosign, and the device checks the signature on
   every update (see step 5). The public key is [`cosign.pub`](cosign.pub).
+
+## Required: Noctalia with the lock-screen keyboard
+
+LegionForge requires a Noctalia build whose lock screen has an on-screen keyboard. The
+Legion Go is often used without a physical keyboard, and without this a locked desktop
+can't be unlocked at all. Fedora's noctalia doesn't have the feature yet (upstream PR
+[noctalia-dev/noctalia#5233](https://github.com/noctalia-dev/noctalia/pull/5233)).
+
+- **Where it comes from:** [shad0wcrawl3r/noctalia-osk](https://github.com/shad0wcrawl3r/noctalia-osk)
+  rebuilds Fedora's package with that patch, and LegionForge installs its signed-provenance
+  releases.
+- **Enforced by the build:** if the build can't get a verified release, or the result lacks
+  the lock-screen keyboard, it fails and no image is published.
+- **When the patch retires:** once Fedora's noctalia includes the feature, noctalia-osk
+  publishes a release saying so, and LegionForge goes back to Fedora's package.
 
 ## What's different from stock Bazzite
 
