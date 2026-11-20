@@ -1,5 +1,5 @@
-# Anaconda installer ISO for LegionForge (built by .github/workflows/build-disk.yml
-# or `just build-iso`).
+# Anaconda installer ISO for LegionForge, built locally with `just build-iso`
+# (not built or published by CI; see CONTRIBUTING.md).
 
 [customizations.installer.kickstart]
 contents = """

@@ -72,23 +72,19 @@ checks:
 If you change the base variant in `Containerfile`, check what the device runs
 (`bootc status`) and update `DEVICE_BASE_IMAGE` to match.
 
-## Installer ISO (manual only)
+## Installer ISO (not distributed)
 
-The ISO is never built automatically. Build one from the Actions tab
-(**Build installer ISO** → **Run workflow**) or with:
+LegionForge doesn't build or publish installer ISOs. Users install Bazzite and then
+`bootc switch` (see README). A CI ISO build existed briefly. It was dropped on 2026-11-20,
+after the first ISO came out at 5.82 GiB, too big to host on a free tier.
 
-```sh
-gh workflow run build-disk.yml            # from :latest
-gh workflow run build-disk.yml -f tag=latest-20261120-abc1234
-gh run watch                              # follow it; the summary shows the ISO size
-gh run download <run-id> -n legionforge-iso
-```
-
-The workflow refuses to build from an image that isn't signed with `cosign.pub`.
-The ISO and its `SHA256SUMS` stay on the run for 7 days. Nothing is published.
-The installer asks for a user account and time zone. It then points the installed system at
-`ghcr.io/shad0wcrawl3r/legionforge:latest` with signature checking turned on.
-`just build-iso` builds the same ISO locally on an x86 Linux machine with podman.
+`just build-iso` can still build one locally on an x86 Linux machine with podman, from
+`disk_config/iso.toml`. Two catches from the CI attempt:
+- **Fedora 45 package repos:** bootc-image-builder only reads `/etc/yum.repos.d`, and
+  Fedora 45 keeps its repo files in `/usr/share/dnf5/repos.d`. So build it from a derived
+  image that copies `fedora.repo` and `fedora-updates.repo` into `/etc/yum.repos.d`.
+- **Ubuntu 26.04 hosts:** osbuild fails there with
+  `mount: /run/osbuild/tree/dev: permission denied`, but works on Ubuntu 24.04.
 
 ## Signing key
 
