@@ -1,0 +1,5 @@
+# LegionForge images are signed with cosign; signatures are stored as sigstore
+# attachments next to the image in the registry.
+docker:
+  ghcr.io/shad0wcrawl3r/legionforge:
+    use-sigstore-attachments: true

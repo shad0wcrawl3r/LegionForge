@@ -9,8 +9,8 @@ compositor, with the **[Noctalia](https://noctalia.dev)** shell.
   and Fedora updates through LegionForge.
 - **Desktop:** niri and Noctalia, from the official Fedora repositories (no COPRs). The GNOME
   desktop is removed.
-- **Signed:** every image is signed with cosign. The public key is
-  [`cosign.pub`](cosign.pub).
+- **Signed:** every image is signed with cosign, and the device checks the signature on
+  every update (see step 5). The public key is [`cosign.pub`](cosign.pub).
 
 ## What's different from stock Bazzite
 
@@ -74,7 +74,23 @@ systemctl reboot
 The first switch downloads the whole image (about 5 GB). Later updates only download what
 changed.
 
-### 5. Set up locking
+### 5. Turn on signature checking
+
+Your old system didn't know LegionForge's signing key, so the first switch can't check the
+signature. Now that LegionForge is running, it does. Switch again with signature checking
+turned on. This downloads nothing new:
+
+```sh
+sudo bootc switch --enforce-container-sigpolicy ghcr.io/shad0wcrawl3r/legionforge:latest
+systemctl reboot
+```
+
+From then on, the device refuses any update that isn't signed with LegionForge's key
+([`cosign.pub`](cosign.pub)). `rpm-ostree status` then shows the image as
+`ostree-image-signed:docker://ghcr.io/shad0wcrawl3r/legionforge:latest`, the same way stock Bazzite
+shows its own image.
+
+### 6. Set up locking
 
 LegionForge locks the desktop by sending you to Gaming Mode, so set Steam's PIN: in Gaming
 Mode, open **Settings → Security** and turn on the lock-screen PIN for startup, for waking
@@ -121,8 +137,6 @@ Your home folder isn't touched in any of these.
 
 - Built and tested on the original Legion Go only. Other handhelds that run Bazzite Deck
   GNOME should work but are untested.
-- The device doesn't check image signatures yet (the switch command uses an unverified
-  transport). CI signs every image; enforcing the signature on the device is planned.
 - niri's default config expects `alacritty` and `fuzzel`, which aren't installed. Bring
   your own niri config, or use Noctalia's launcher.
 

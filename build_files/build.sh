@@ -185,3 +185,16 @@ ln -sf ../legionforge-away-on-resume.service \
     /usr/lib/systemd/user/niri.service.wants/legionforge-away-on-resume.service
 # Kept for keyboard users who lock manually: deterministic PAM service.
 test -e /etc/pam.d/noctalia
+
+#### Image signature verification on the device (LFORGE-7)
+# Trust LegionForge's cosign key for ghcr.io/shad0wcrawl3r/legionforge, the
+# same way Bazzite trusts ghcr.io/ublue-os. Devices then switch once with
+# `bootc switch --enforce-container-sigpolicy` and refuse unsigned updates.
+install -Dm0644 /ctx/cosign.pub /etc/pki/containers/legionforge.pub
+policy=/etc/containers/policy.json
+jq --arg repo "ghcr.io/shad0wcrawl3r/legionforge" \
+   --arg key "/etc/pki/containers/legionforge.pub" \
+   '.transports.docker[$repo] = [{"type": "sigstoreSigned", "keyPath": $key, "signedIdentity": {"type": "matchRepository"}}]' \
+   "$policy" > "$policy.new"
+mv "$policy.new" "$policy"
+jq -e '.transports.docker["ghcr.io/shad0wcrawl3r/legionforge"][0].type == "sigstoreSigned"' "$policy"

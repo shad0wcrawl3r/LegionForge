@@ -75,6 +75,16 @@ check "ujust parses and has the LegionForge recipes" \
 check "no GNOME-only ujust recipes left" \
   "! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list | grep -qE 'restore-gnome-(de-settings|folders)' && ! JUST_JUSTFILE=/usr/share/ublue-os/justfile just --show restore-virtual-keyboard | grep -q gnome-extensions"
 
+echo "== Image signature trust"
+check "policy.json trusts ghcr.io/shad0wcrawl3r/legionforge via sigstore + registries.d attachments" \
+  "jq -e '.transports.docker[\"ghcr.io/shad0wcrawl3r/legionforge\"][0] | .type == \"sigstoreSigned\" and .keyPath == \"/etc/pki/containers/legionforge.pub\"' /etc/containers/policy.json && grep -q 'use-sigstore-attachments: true' /etc/containers/registries.d/legionforge.yaml && jq -e '.transports.docker[\"ghcr.io/ublue-os\"]' /etc/containers/policy.json"
+if cmp -s <(in_image "cat /etc/pki/containers/legionforge.pub") cosign.pub; then
+  echo "ok   - shipped signing key matches cosign.pub"
+else
+  echo "::error title=Smoke test::shipped /etc/pki/containers/legionforge.pub differs from cosign.pub"
+  fail=1
+fi
+
 echo "== SELinux types vs device policy (${DEVICE_BASE})"
 in_image "cat /etc/selinux/targeted/contexts/files/file_contexts" > "$WORK/file_contexts"
 if ! podman image exists "$DEVICE_BASE"; then
