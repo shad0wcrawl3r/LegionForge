@@ -1,0 +1,174 @@
+# Legix boot animation for Plymouth's script plugin.
+#
+# Choreography (logo V5, "Animation 7" on the design canvas):
+#   1. both L fins fade in, bunched into the middle where the V will land
+#   2. the V falls from above, lands with a small bounce, and pushes the fins out
+#   3. the gem drops into the notch, flashes as it lands, and bounces
+#   4. the wordmark rises in, the progress line follows real boot progress,
+#      and the gem glows gently until boot finishes
+# Every part image shares one 200x200-unit canvas, so all sprites sit at the
+# same origin and only their offsets move. Plymouth calls refresh() ~50x/s.
+
+Window.SetBackgroundTopColor(0.043, 0.047, 0.055);
+Window.SetBackgroundBottomColor(0.043, 0.047, 0.055);
+
+W = Window.GetWidth();
+H = Window.GetHeight();
+short = Math.Min(W, H);
+size = Math.Int(short * 0.30);          # logo box in pixels
+u = size / 200;                         # pixels per logo unit
+cx = Window.GetX() + W / 2;
+logo_x = cx - size / 2;
+logo_y = Window.GetY() + H / 2 - size * 0.62;
+
+fun part(name, z) {
+  local.s = Sprite(Image(name).Scale(size, size));
+  local.s.SetPosition(logo_x, logo_y, z);
+  local.s.SetOpacity(0);
+  return local.s;
+}
+
+l_left = part("l-left.png", 10);
+l_right = part("l-right.png", 10);
+v = part("v.png", 20);
+gem = part("gem.png", 30);
+glow = part("gem-glow.png", 31);
+
+word_img = Image("wordmark.png");
+word_w = Math.Int(size * 0.80);
+word_h = Math.Int(word_img.GetHeight() * word_w / word_img.GetWidth());
+word = Sprite(word_img.Scale(word_w, word_h));
+word_y = logo_y + size + size * 0.10;
+word.SetPosition(cx - word_w / 2, word_y, 40);
+word.SetOpacity(0);
+
+bar_w = Math.Int(size * 0.73);
+bar_h = Math.Max(2, Math.Int(size / 110));
+bar_y = word_y + word_h + size * 0.12;
+bar_bg = Sprite(Image("bar-bg.png").Scale(bar_w, bar_h));
+bar_bg.SetPosition(cx - bar_w / 2, bar_y, 40);
+bar_bg.SetOpacity(0);
+bar_img = Image("bar.png");
+bar = Sprite(bar_img.Scale(1, bar_h));
+bar.SetPosition(cx - bar_w / 2, bar_y, 41);
+bar.SetOpacity(0);
+
+t = 0;
+progress = 0;
+shown_bar_w = -1;
+
+fun clamp01(x) {
+  if (x < 0) return 0;
+  if (x > 1) return 1;
+  return x;
+}
+fun seg(a, b) { return clamp01((t - a) / (b - a)); }
+fun ease_in(x) { return x * x * x; }
+fun ease_out(x) { local.y = 1 - x; return 1 - local.y * local.y * local.y; }
+fun mix(a, b, k) { return a + (b - a) * k; }
+
+# Fin x offset (logo units): bunched +-34 inward until the V lands at 1.56 s,
+# pushed out with a 3-unit overshoot, settled by 2.40 s.
+fun fin_offset() {
+  if (t < 1.56) return 34;
+  if (t < 2.04) return mix(34, -3, ease_out(seg(1.56, 2.04)));
+  return mix(-3, 0, ease_out(seg(2.04, 2.40)));
+}
+
+# V y offset: falls from -110 (1.08 s) to 0 (1.56 s), bounces -4, settles 1.92 s.
+fun v_offset() {
+  if (t < 1.56) return mix(-110, 0, ease_in(seg(1.08, 1.56)));
+  if (t < 1.74) return mix(0, -4, ease_out(seg(1.56, 1.74)));
+  return mix(-4, 0, ease_in(seg(1.74, 1.92)));
+}
+
+# Gem y offset: drops from -84 (1.86 s) to 0 (2.16 s), bounces -5, settles 2.46 s.
+fun gem_offset() {
+  if (t < 2.16) return mix(-84, 0, ease_in(seg(1.86, 2.16)));
+  if (t < 2.28) return mix(0, -5, ease_out(seg(2.16, 2.28)));
+  return mix(-5, 0, ease_in(seg(2.28, 2.46)));
+}
+
+# Glow: a flash on landing, then a slow pulse while the system boots.
+fun glow_opacity() {
+  if (t < 2.16) return 0;
+  if (t < 2.46) return 1 - seg(2.16, 2.46);
+  if (t < 3.60) return 0;
+  local.phase = (t - 3.60) / 2.4;
+  local.phase = local.phase - Math.Int(local.phase);
+  return 0.35 * (0.5 - 0.5 * Math.Cos(local.phase * 2 * 3.14159));
+}
+
+fun refresh() {
+  global.t = t + 0.02;
+
+  fin = fin_offset() * u;
+  fin_alpha = ease_out(seg(0.36, 0.84));
+  l_left.SetPosition(logo_x + fin, logo_y - 4 * u * (1 - seg(1.56, 2.04)), 10);
+  l_right.SetPosition(logo_x - fin, logo_y - 4 * u * (1 - seg(1.56, 2.04)), 10);
+  l_left.SetOpacity(fin_alpha);
+  l_right.SetOpacity(fin_alpha);
+
+  v.SetPosition(logo_x, logo_y + v_offset() * u, 20);
+  v.SetOpacity(seg(0.96, 1.08));
+
+  gy = logo_y + gem_offset() * u;
+  gem.SetPosition(logo_x, gy, 30);
+  gem.SetOpacity(seg(1.80, 1.86));
+  glow.SetPosition(logo_x, gy, 31);
+  glow.SetOpacity(glow_opacity());
+
+  word_k = ease_out(seg(2.64, 3.36));
+  word.SetPosition(cx - word_w / 2, word_y + 8 * u * (1 - word_k), 40);
+  word.SetOpacity(word_k);
+
+  if (Plymouth.GetMode() == "boot") {
+    bar_k = seg(2.76, 3.24);
+    bar_bg.SetOpacity(bar_k);
+    bar.SetOpacity(bar_k);
+    w = Math.Max(1, Math.Int(bar_w * progress));
+    if (w != shown_bar_w) {
+      bar.SetImage(bar_img.Scale(w, bar_h));
+      global.shown_bar_w = w;
+    }
+  }
+}
+Plymouth.SetRefreshFunction(refresh);
+
+fun boot_progress(duration, value) {
+  global.progress = value;
+}
+Plymouth.SetBootProgressFunction(boot_progress);
+
+# Status messages (e.g. from systemd) under the progress line.
+message = Sprite();
+fun show_message(text) {
+  message.SetImage(Image.Text(text, 0.54, 0.56, 0.60, 1));
+  message.SetPosition(cx - message.GetImage().GetWidth() / 2, bar_y + size * 0.10, 50);
+}
+Plymouth.SetMessageFunction(show_message);
+
+# Password prompt (for an encrypted disk): prompt text and one dot per character.
+prompt = Sprite();
+dots = Sprite();
+fun show_password(prompt_text, bullets) {
+  prompt.SetImage(Image.Text(prompt_text, 0.93, 0.93, 0.95, 1));
+  prompt.SetPosition(cx - prompt.GetImage().GetWidth() / 2, bar_y + size * 0.10, 60);
+  prompt.SetOpacity(1);
+  local.s = " ";
+  local.i = 0;
+  while (local.i < bullets) {
+    local.s = local.s + "● ";
+    local.i = local.i + 1;
+  }
+  dots.SetImage(Image.Text(local.s, 0.90, 0.26, 0.18, 1));
+  dots.SetPosition(cx - dots.GetImage().GetWidth() / 2, bar_y + size * 0.18, 60);
+  dots.SetOpacity(1);
+}
+Plymouth.SetDisplayPasswordFunction(show_password);
+
+fun show_normal() {
+  prompt.SetOpacity(0);
+  dots.SetOpacity(0);
+}
+Plymouth.SetDisplayNormalFunction(show_normal);

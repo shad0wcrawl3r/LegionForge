@@ -1,3 +1,10 @@
+# Legix boot animation: render branding/plymouth/*.svg to PNG for the Plymouth
+# theme here, so rsvg-convert is never installed in the image.
+FROM registry.fedoraproject.org/fedora:45 AS plymouth-assets
+COPY branding/plymouth /svg
+COPY build_files/plymouth/render.sh /render.sh
+RUN --mount=type=cache,dst=/var/cache/libdnf5 dnf5 -y install librsvg2-tools && /render.sh /svg /out
+
 # Allow build scripts to be referenced without being copied into the final image
 FROM scratch AS ctx
 COPY build_files /
@@ -7,6 +14,7 @@ COPY cosign.pub /cosign.pub
 # Patched Noctalia RPM (lock-screen on-screen keyboard), released by
 # shad0wcrawl3r/noctalia-osk and fetched by CI. Empty = Fedora's package.
 COPY noctalia-rpms /noctalia-rpms
+COPY --from=plymouth-assets /out /plymouth
 
 # Base Image
 FROM ghcr.io/ublue-os/bazzite-deck-gnome:stable
