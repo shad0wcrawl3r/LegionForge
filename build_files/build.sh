@@ -157,3 +157,13 @@ ln -sf ../noctalia.service /usr/lib/systemd/user/niri.service.wants/noctalia.ser
 # Seed LegionForge's Noctalia defaults (full-width bar, icon-only widgets)
 # into ~/.config/noctalia before Noctalia starts. See noctalia.service.d/.
 chmod 0755 /usr/libexec/legionforge-noctalia-defaults
+
+#### Desk security without a keyboard (LFORGE-15): Steam's lock-screen PIN
+# is the lock. Lock / idle / suspend in niri go to Gaming Mode (Noctalia
+# defaults above), and waking in niri does too. Noctalia's own lock screen is
+# never triggered automatically: it needs a physical keyboard to unlock.
+chmod 0755 /usr/libexec/legionforge-away /usr/libexec/legionforge-away-on-resume
+ln -sf ../legionforge-away-on-resume.service \
+    /usr/lib/systemd/user/niri.service.wants/legionforge-away-on-resume.service
+# Kept for keyboard users who lock manually: deterministic PAM service.
+test -e /etc/pam.d/noctalia

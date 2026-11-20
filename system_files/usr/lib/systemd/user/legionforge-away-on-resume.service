@@ -1,0 +1,12 @@
+[Unit]
+Description=LegionForge: go to Gaming Mode (Steam PIN) when waking in the desktop
+Documentation=https://github.com/shad0wcrawl3r/LegionForge
+PartOf=niri.service
+After=niri.service
+# Opt out machine-wide or per user (ujust toggle-away-on-wake).
+ConditionPathExists=!/etc/legionforge/no-away-on-wake
+ConditionPathExists=!%h/.config/legionforge/no-away-on-wake
+
+[Service]
+ExecStart=/usr/libexec/legionforge-away-on-resume
+Restart=on-failure

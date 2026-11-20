@@ -28,3 +28,18 @@ restore-virtual-keyboard:
 # Check your niri config for errors
 niri-validate:
     niri validate
+
+# Leave the desktop for Gaming Mode now (Steam's PIN locks it, if set)
+away:
+    /usr/libexec/legionforge-away
+
+# Turn "go to Gaming Mode when waking in the desktop" on or off for this user
+toggle-away-on-wake:
+    #!/usr/bin/bash
+    flag="${XDG_CONFIG_HOME:-$HOME/.config}/legionforge/no-away-on-wake"
+    if [[ -e "$flag" ]]; then
+      rm -f "$flag"; echo "ON: waking in the desktop goes to Gaming Mode (Steam PIN)."
+    else
+      mkdir -p "$(dirname "$flag")"; touch "$flag"; echo "OFF: the desktop wakes unlocked."
+    fi
+    echo "Takes effect at the next desktop session."

@@ -1,0 +1,5 @@
+#%PAM-1.0
+# LegionForge: Noctalia's lock screen authenticates through this service.
+# Same password check as a console login (pam_unix via system-auth).
+auth       include      login
+account    include      login
