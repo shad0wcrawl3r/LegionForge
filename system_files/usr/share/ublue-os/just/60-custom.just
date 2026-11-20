@@ -29,16 +29,17 @@ restore-virtual-keyboard:
 niri-validate:
     niri validate
 
-# Turn "lock the desktop when niri starts" on or off for this user
-toggle-desktop-lock:
-    #!/usr/bin/bash
-    flag="${XDG_CONFIG_HOME:-$HOME/.config}/legionforge/no-lock-on-desktop"
-    if [[ -e "$flag" ]]; then
-      rm -f "$flag"; echo "Desktop lock ON: niri locks as soon as it starts."
-    else
-      mkdir -p "$(dirname "$flag")"; touch "$flag"; echo "Desktop lock OFF: niri opens unlocked."
-    fi
+# Leave the desktop for Gaming Mode now (Steam's PIN locks it, if set)
+away:
+    /usr/libexec/legionforge-away
 
-# Lock the screen now (to check your password unlocks it)
-test-lock:
-    noctalia msg session lock
+# Turn "go to Gaming Mode when waking in the desktop" on or off for this user
+toggle-away-on-wake:
+    #!/usr/bin/bash
+    flag="${XDG_CONFIG_HOME:-$HOME/.config}/legionforge/no-away-on-wake"
+    if [[ -e "$flag" ]]; then
+      rm -f "$flag"; echo "ON: waking in the desktop goes to Gaming Mode (Steam PIN)."
+    else
+      mkdir -p "$(dirname "$flag")"; touch "$flag"; echo "OFF: the desktop wakes unlocked."
+    fi
+    echo "Takes effect at the next desktop session."

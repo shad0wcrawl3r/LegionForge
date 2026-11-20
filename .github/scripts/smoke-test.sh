@@ -55,8 +55,8 @@ check "Noctalia wizard state not shipped (wizard must appear on first start)" \
 check "Bazzite Portal does not autostart for new users" \
   "test ! -e /etc/skel/.config/autostart/bazzite-portal.desktop"
 
-check "desk lock: PAM service, lock-on-start unit wired to niri, idle lock in defaults" \
-  "test -e /etc/pam.d/noctalia && grep -q 'include *login' /etc/pam.d/noctalia && test -x /usr/libexec/legionforge-lock-on-desktop && test \"\$(readlink -f /usr/lib/systemd/user/niri.service.wants/legionforge-lock-on-desktop.service)\" = /usr/lib/systemd/user/legionforge-lock-on-desktop.service && grep -A2 'idle.behavior.lock' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml | grep -q 'enabled = true'"
+check "desk security: away-to-Gaming-Mode wired, never auto-locks niri (no keyboard)" \
+  "test -x /usr/libexec/legionforge-away && bash -n /usr/libexec/legionforge-away && test \"\$(readlink -f /usr/lib/systemd/user/niri.service.wants/legionforge-away-on-resume.service)\" = /usr/lib/systemd/user/legionforge-away-on-resume.service && test ! -e /usr/lib/systemd/user/niri.service.wants/legionforge-lock-on-desktop.service && grep -qx 'lock_before_suspend = false' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml && grep -A3 '^\[idle.behavior.lock\]' /usr/share/legionforge/noctalia/00-legionforge-defaults.toml | grep -q 'enabled = false'"
 
 echo "== GNOME removed, niri essentials kept"
 check "GNOME desktop removed (gdm gnome-shell gnome-session gnome-control-center)" \
