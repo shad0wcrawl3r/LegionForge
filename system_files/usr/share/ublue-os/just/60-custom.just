@@ -5,14 +5,18 @@
 restore-noctalia-setup:
     #!/usr/bin/bash
     set -euo pipefail
-    cfg="${XDG_CONFIG_HOME:-$HOME/.config}/noctalia/settings.toml"
-    if [[ -f "$cfg" ]]; then
-      mv -v "$cfg" "$cfg.bak.$(date +%Y%m%d-%H%M%S)"
+    state="${XDG_STATE_HOME:-$HOME/.local/state}/noctalia"
+    backup="$HOME/noctalia-state-backup-$(date +%Y%m%d-%H%M%S)"
+    running=false
+    systemctl --user is-active -q noctalia.service && running=true
+    $running && systemctl --user stop noctalia.service
+    if [[ -d "$state" ]]; then
+      mv -v "$state" "$backup"
     else
-      echo "No Noctalia settings found; the wizard will already run on next start."
+      echo "No Noctalia state found; the wizard will already run on next start."
     fi
-    # Only restarts it if it is running (i.e. inside a niri session).
-    systemctl --user try-restart noctalia.service || true
+    # Only start it again if it was running (i.e. inside a niri session).
+    $running && systemctl --user start noctalia.service
     echo "Noctalia's setup wizard runs on its next start (now, if niri is running)."
 
 # On-screen keyboard help for niri

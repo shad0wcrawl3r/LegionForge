@@ -48,6 +48,13 @@ check "no Noctalia settings shipped (first-run wizard must appear)" \
 check "steamos-manager desktop pinned to niri at login (OpenGamepadUI path)" \
   "test -x /usr/libexec/legionforge-desktop-session && bash -n /usr/libexec/legionforge-desktop-session && test -L /etc/systemd/user/default.target.wants/legionforge-desktop-session.service"
 
+check "Noctalia defaults ship, are valid, and are seeded before Noctalia starts" \
+  "noctalia config validate /usr/share/legionforge/noctalia/00-legionforge-defaults.toml 2>&1 | grep -q 'Config is valid' && ! noctalia config validate /usr/share/legionforge/noctalia/00-legionforge-defaults.toml 2>&1 | grep -q 'unknown setting' && test -x /usr/libexec/legionforge-noctalia-defaults && grep -q legionforge-noctalia-defaults /usr/lib/systemd/user/noctalia.service.d/10-legionforge-defaults.conf"
+check "Noctalia wizard state not shipped (wizard must appear on first start)" \
+  "! find /etc/skel /usr/share -path '*noctalia*' \\( -name .setup-complete -o -name settings.toml \\) 2>/dev/null | grep -q ."
+check "Bazzite Portal does not autostart for new users" \
+  "test ! -e /etc/skel/.config/autostart/bazzite-portal.desktop"
+
 echo "== GNOME removed, niri essentials kept"
 check "GNOME desktop removed (gdm gnome-shell gnome-session gnome-control-center)" \
   "for p in gdm gnome-shell gnome-session gnome-control-center; do ! rpm -q \$p; done && test ! -e /usr/share/wayland-sessions/gnome.desktop"

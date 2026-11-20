@@ -91,13 +91,22 @@ JUST_JUSTFILE=/usr/share/ublue-os/justfile just --list > /dev/null
 
 systemctl enable podman.socket
 
+#### Don't open Bazzite Portal (the welcome/help window) at every login.
+# Bazzite seeds it into new homes via /etc/skel; the app itself stays in the
+# launcher.
+rm -f /etc/skel/.config/autostart/bazzite-portal.desktop
+
 #### Noctalia: start automatically in niri sessions
 # Use the systemd user unit Noctalia ships as a template, so it tracks
 # upstream. It is pulled in by niri.service only, never by GNOME or Gaming
-# Mode. No settings are shipped: on first start Noctalia runs its setup
-# wizard and saves choices to ~/.config/noctalia/settings.toml.
+# Mode. Its first-run wizard state is not shipped: on first start Noctalia
+# runs the wizard and saves choices to ~/.local/state/noctalia/settings.toml,
+# layered over the LegionForge defaults below.
 # Opt out per user: systemctl --user mask noctalia.service
 install -Dm0644 /usr/share/noctalia/assets/noctalia.service \
     /usr/lib/systemd/user/noctalia.service
 mkdir -p /usr/lib/systemd/user/niri.service.wants
 ln -sf ../noctalia.service /usr/lib/systemd/user/niri.service.wants/noctalia.service
+# Seed LegionForge's Noctalia defaults (full-width bar, icon-only widgets)
+# into ~/.config/noctalia before Noctalia starts. See noctalia.service.d/.
+chmod 0755 /usr/libexec/legionforge-noctalia-defaults
