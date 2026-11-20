@@ -36,6 +36,10 @@ to act (e.g. `feat!: switch base to bazzite-deck-gnome`).
 
 ## Patched Noctalia (lock-screen keyboard)
 
+**This is a hard requirement.** Don't remove the fetch step or the smoke test's lock-screen
+keyboard check. Without the feature, a keyboardless Go can't unlock its desktop. Any change to
+how Noctalia is installed must keep both.
+
 LegionForge ships Noctalia with upstream PR #5233 (the lock-screen on-screen keyboard).
 The RPM is built and released by
 [shad0wcrawl3r/noctalia-osk](https://github.com/shad0wcrawl3r/noctalia-osk), once per
