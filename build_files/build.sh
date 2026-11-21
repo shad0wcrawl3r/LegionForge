@@ -304,3 +304,34 @@ systemctl --global enable legix-steam-videos.service
 sed -i 's/^Name=Bazzite Updater$/Name=Legix Updater/' /usr/share/applications/io.github.rfrench3.bazzite-updater.desktop
 grep -qx 'Name=Legix Updater' /usr/share/applications/io.github.rfrench3.bazzite-updater.desktop
 
+#### Lean desktop (client, 2026-11-21): nothing the client doesn't use.
+# Waydroid (+ its LXC/gbinder stack), Web Apps, Rygel, GNOME Help. This exact
+# set was previewed with `dnf5 remove --assumeno` on the device.
+remove_exactly \
+    libgbinder lxc lxc-libs lxc-templates lxcfs python3-gbinder \
+    rygel waydroid waydroid-selinux webapp-manager yelp
+# Launcher entries that aren't owned by a package.
+rm -f /usr/share/applications/discourse.desktop \
+      /usr/share/applications/bazzite-documentation.desktop \
+      /usr/share/applications/waydroid-container-restart.desktop \
+      /usr/share/applications/bbrew.desktop
+# yad stays (scripts use it); its icon browser just leaves the launcher.
+sed -i '/^\[Desktop Entry\]/a NoDisplay=true' /usr/share/applications/yad-icon-browser.desktop
+# ujust recipes for removed apps (ujust imports every file, so empty, not delete).
+: > /usr/share/ublue-os/just/82-bazzite-waydroid.just
+: > /usr/share/ublue-os/just/88-bazzite-webapps.just
+# Homebrew: not set up by default; nix or brew becomes an opt-in later. The
+# bundled tarball alone is ~160 MB.
+systemctl disable brew-setup.service brew-update.timer brew-upgrade.timer
+systemctl mask brew-setup.service
+rm -f /usr/share/homebrew.tar.zst /etc/profile.d/brew.sh /etc/profile.d/brew-bash-completion.sh
+# Flatpaks: trim Bazzite's preinstalls and install Zen, once per list version.
+chmod 0755 /usr/libexec/legix-flatpak-setup
+systemctl enable legix-flatpak-setup.service
+
+#### niri: Legix's default config (/etc/niri/config.kdl), generated from niri's
+# own default. Used only when the user has no ~/.config/niri/config.kdl.
+mkdir -p /etc/niri
+python3 /ctx/niri-config.py /usr/share/doc/niri/default-config.kdl /etc/niri/config.kdl
+niri validate -c /etc/niri/config.kdl
+
