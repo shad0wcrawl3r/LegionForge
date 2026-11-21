@@ -154,12 +154,21 @@ The old name stops getting updates after 2027-01-31.
 
 ## Updates
 
-Updates install automatically in the background, like on stock Bazzite. To update now:
+Updates don't install by themselves. Like stock Bazzite's Deck images, Legix leaves that
+to Steam, so a download never starts in the middle of a game:
 
-```sh
-sudo bootc upgrade
-systemctl reboot
-```
+- **System (Legix itself):** in Gaming Mode, open **Settings → System → Check for updates**.
+  This installs the newest Legix image. It takes effect after a restart.
+- **Apps (Flatpaks):** open **Legix Updater** on the desktop. It updates the system and your
+  Flatpaks together. You can also use the **Bazaar** app store.
+- **From a terminal:**
+
+  ```sh
+  sudo bootc upgrade
+  systemctl reboot
+  ```
+
+New Legix images are built every day.
 
 ## Going back to stock Bazzite
 
