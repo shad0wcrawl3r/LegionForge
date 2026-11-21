@@ -245,12 +245,17 @@ setkv VARIANT '"Legix (based on Bazzite Deck)"'
 grep -qx 'NAME="Legix"' "$osr"
 grep -qx 'ID=bazzite' "$osr"
 sed -i 's/^Bazzite/Legix/' /etc/system-release
-# image-info.json: read by the terminal banner, fastfetch and ujust helpers.
+# image-info.json: only image-ref (what the terminal banner and fastfetch
+# show) becomes Legix's. image-name and image-vendor MUST stay Bazzite's
+# (bazzite-deck-gnome / ublue-os): bazzite-hardware-setup, -autologin,
+# -user-setup, ujust and others match on image-name ("deck", "silverblue",
+# "nvidia"...). With "legix" it deleted the Deck autologin, so the Go booted
+# to the SDDM login screen instead of Gaming Mode, and skipped handheld setup.
 info=/usr/share/ublue-os/image-info.json
-jq '."image-name" = "legix" | ."image-vendor" = "shad0wcrawl3r"
-    | ."image-ref" = "ostree-image-signed:docker://ghcr.io/shad0wcrawl3r/legix"' \
+jq '."image-ref" = "ostree-image-signed:docker://ghcr.io/shad0wcrawl3r/legix"' \
    "$info" > "$info.new"
 mv "$info.new" "$info"
+jq -e '."image-name" | test("deck")' "$info"
 # Logo icon (os-release LOGO), in every size, rendered in the assets stage.
 install -Dm0644 /ctx/branding/legix-mark.svg /usr/share/icons/hicolor/scalable/apps/legix-logo.svg
 for png in /ctx/branding-png/icons/*.png; do
