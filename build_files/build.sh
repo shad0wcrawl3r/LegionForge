@@ -349,3 +349,37 @@ for conf in /etc/bluetooth/main.conf /usr/etc/bluetooth/main.conf; do
   grep -qx 'Privacy=off' "$conf"
 done
 
+#### Trim for the Legion Go (client, 2026-11-21): ~2.2 GB less in the image.
+# Optimised for the original Legion Go (AMD GPU, MediaTek Wi-Fi/Bluetooth).
+# Each set was dry-run in a container of the published image first. Anything
+# here can come back on a device with `ujust legix-extras`, except kernel
+# headers for Bazzite's kernel and ScopeBuddy (not in the enabled repos).
+# Must stay last: the niri config above is generated from /usr/share/doc.
+# Unused by anything on the device: cosign (signatures are checked by
+# containers' policy.json, not cosign) and the AWS SDK.
+remove_exactly cosign python3-boto3 python3-botocore python3-s3transfer
+# NVIDIA and Intel GPU/Wi-Fi firmware, Intel OpenCL and microcode, and the
+# second LLVM (22) that only Intel's OpenCL compiler used.
+remove_exactly \
+    clang22-libs intel-gpu-firmware intel-igc intel-igc-libs intel-opencl \
+    intel-opencl-clang intel-vsc-firmware iwlwifi-dvm-firmware \
+    iwlwifi-mld-firmware iwlwifi-mvm-firmware lld22-libs llvm22-libs \
+    microcode_ctl nvidia-gpu-firmware spirv-llvm-translator22
+# Compiler toolchain and kernel headers. The perl meta-package depends on gcc
+# (via ExtUtils-CBuilder), and ScopeBuddy on it; perl-interpreter stays.
+remove_exactly \
+    ScopeBuddy annobin-plugin-gcc gcc gcc-c++ gcc-plugin-annobin kernel-devel \
+    kernel-devel-matched perl perl-CPAN perl-ExtUtils-CBuilder
+# ROCm compute (Steam, Proton and Mesa don't use it).
+remove_exactly rocm-clinfo rocm-comgr rocm-filesystem rocm-opencl rocm-runtime rocm-smi
+# English only, instead of every glibc locale.
+dnf5 swap -y glibc-all-langpacks glibc-langpack-en
+rpm -q glibc-langpack-en
+! rpm -q glibc-all-langpacks
+# Steam's offline first-start bootstrap (~570 MB). bazzite-steam and the
+# session only use it if present; without it Steam downloads itself on first
+# launch.
+rm -f /usr/share/gamescope-session-plus/bootstrap_steam.tar.zst
+# Documentation (licences stay in /usr/share/licenses).
+rm -rf /usr/share/doc/*
+
