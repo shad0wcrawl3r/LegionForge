@@ -107,6 +107,9 @@ check "Flatpak trim + Zen setup enabled" \
 check "niri default config: Noctalia launcher on Mod+Space, Ptyxis terminal, valid" \
   "niri validate -c /etc/niri/config.kdl && grep -q 'Mod+Space .*panel-toggle\" \"launcher' /etc/niri/config.kdl && grep -q 'Mod+T .*ptyxis' /etc/niri/config.kdl && ! grep -q 'spawn-at-startup \"waybar\"' /etc/niri/config.kdl"
 
+check "Bluetooth host privacy off (LE keyboards survive reboots)" \
+  "grep -qx 'Privacy=off' /etc/bluetooth/main.conf && ! grep -q '^Privacy=device' /etc/bluetooth/main.conf"
+
 echo "== Legix branding"
 check "os-release says Legix (ID stays bazzite for Bazzite's tools) with the Legix logo icon" \
   "grep -qx 'NAME=\"Legix\"' /usr/lib/os-release && grep -qx 'PRETTY_NAME=\"Legix\"' /usr/lib/os-release && grep -qx 'ID=bazzite' /usr/lib/os-release && grep -qx 'LOGO=legix-logo' /usr/lib/os-release && test -s /usr/share/icons/hicolor/scalable/apps/legix-logo.svg && test -s /usr/share/icons/hicolor/256x256/apps/legix-logo.png"

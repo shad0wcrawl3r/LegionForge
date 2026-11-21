@@ -335,3 +335,17 @@ mkdir -p /etc/niri
 python3 /ctx/niri-config.py /usr/share/doc/niri/default-config.kdl /etc/niri/config.kdl
 niri validate -c /etc/niri/config.kdl
 
+#### Bluetooth: host privacy off, so LE keyboards reconnect after a reboot.
+# Bazzite ships Privacy=device: the Go then connects from a random address
+# that changes every boot (handled by the controller, "ll-privacy"). Many
+# multi-host LE keyboards (seen with an AK980 PRO on the Go, 2026-11-21) don't
+# resolve it, so after each reboot they reject the encrypted reads (ATT 0x0E
+# on HID Information / Report Reference) until re-paired. BlueZ has no
+# per-device switch, so use the fixed public address for all LE links.
+# Pairing and encryption are unchanged; tested on the device before shipping.
+for conf in /etc/bluetooth/main.conf /usr/etc/bluetooth/main.conf; do
+  [[ -f "$conf" ]] || continue
+  sed -i 's/^Privacy=.*/Privacy=off/' "$conf"
+  grep -qx 'Privacy=off' "$conf"
+done
+
