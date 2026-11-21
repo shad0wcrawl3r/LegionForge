@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Legix</title>
+<meta name="description" content="Legix is a Bazzite-based OS for the original Lenovo Legion Go: Steam's Gaming Mode in your hands, the niri tiling desktop with the Noctalia shell at your desk.">
+<link rel="icon" href="legix-mark.svg" type="image/svg+xml">
+<style>
+@font-face{font-family:"Chakra Petch";font-weight:700;font-display:swap;src:url("ChakraPetch-Bold.ttf") format("truetype")}
+:root{--bg:#0B0C0E;--panel:#121418;--line:#23262C;--text:#ECEEF1;--muted:#A3A9B2;--dim:#6E747D;--red:#E5432D;--fin:#B8321F;--ember:#FF6A3D;--ember2:#FF9A55}
+*{box-sizing:border-box}
+html{color-scheme:dark}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--ember2)}
+a:hover{color:var(--ember)}
+code{font:0.92em ui-monospace,SFMono-Regular,Menlo,monospace;background:#1A1D22;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+pre{margin:12px 0 0;background:#0F1114;border:1px solid var(--line);border-radius:8px;padding:14px 16px;overflow-x:auto}
+pre code{background:none;border:0;padding:0;font-size:14px;color:var(--text)}
+.wrap{max-width:960px;margin:0 auto;padding:0 20px}
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+.brand{display:flex;align-items:center;gap:10px;font:700 18px/1 "Chakra Petch",system-ui,sans-serif;letter-spacing:.22em;color:var(--text);text-decoration:none}
+.brand img{width:28px;height:28px}
+nav a{color:var(--muted);text-decoration:none;margin-left:20px;font-size:15px}
+nav a:hover{color:var(--text)}
+.hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:56px 0 64px}
+.hero svg{width:min(240px,56vw);height:auto;overflow:visible}
+.word{font:700 clamp(34px,7vw,52px)/1 "Chakra Petch",system-ui,sans-serif;letter-spacing:.22em;margin:28px 0 0 .22em}
+.tag{max-width:620px;color:var(--muted);font-size:clamp(17px,2.4vw,20px);margin:20px 0 0}
+.cta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:32px}
+.btn{display:inline-block;padding:11px 20px;border-radius:8px;font-weight:600;text-decoration:none;border:1px solid var(--line);color:var(--text)}
+.btn.primary{background:var(--red);border-color:var(--red);color:#fff}
+.btn.primary:hover{background:#F0503A;color:#fff}
+.btn:hover{border-color:#3A3E46;color:var(--text)}
+section{padding:48px 0;border-top:1px solid var(--line)}
+h2{font:700 13px/1 "Chakra Petch",system-ui,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--ember2);margin:0 0 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 18px 16px}
+.card h3{margin:0 0 6px;font-size:16px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+ol.steps{margin:0;padding-left:22px}
+ol.steps li{margin:0 0 22px;padding-left:4px}
+ol.steps li::marker{color:var(--ember2);font-weight:700}
+ol.steps p{margin:4px 0 0;color:var(--muted)}
+.note{color:var(--muted);font-size:15px}
+footer{border-top:1px solid var(--line);padding:28px 0 48px;color:var(--dim);font-size:14px}
+footer p{margin:6px 0}
+/* Boot animation, same choreography as the Plymouth theme (Animation 7). */
+.part{transform-box:fill-box;transform-origin:center}
+.fin-l{animation:fin-l 6s linear infinite}
+.fin-r{animation:fin-r 6s linear infinite}
+.visor{animation:visor 6s linear infinite}
+.gem{animation:gem 6s linear infinite}
+@keyframes fin-l{0%,6%{opacity:0;transform:translate(34px,-4px);animation-timing-function:ease-out}14%{opacity:1;transform:translate(34px,-4px)}26%{transform:translate(34px,-4px);animation-timing-function:cubic-bezier(.15,.9,.3,1)}34%{transform:translate(-3px,0)}40%,100%{opacity:1;transform:translate(0,0)}}
+@keyframes fin-r{0%,6%{opacity:0;transform:translate(-34px,-4px);animation-timing-function:ease-out}14%{opacity:1;transform:translate(-34px,-4px)}26%{transform:translate(-34px,-4px);animation-timing-function:cubic-bezier(.15,.9,.3,1)}34%{transform:translate(3px,0)}40%,100%{opacity:1;transform:translate(0,0)}}
+@keyframes visor{0%,16%{opacity:0;transform:translateY(-120px);animation-timing-function:ease-in}18%{opacity:1;transform:translateY(-110px);animation-timing-function:cubic-bezier(.55,0,1,.45)}26%{transform:translateY(0);animation-timing-function:ease-out}29%{transform:translateY(-4px);animation-timing-function:ease-in}32%,100%{opacity:1;transform:translateY(0)}}
+@keyframes gem{0%,30%{opacity:0;transform:translateY(-90px);animation-timing-function:ease-in}31%{opacity:1;transform:translateY(-84px);animation-timing-function:cubic-bezier(.55,0,1,.45)}36%{transform:translateY(0);filter:brightness(1.6);animation-timing-function:ease-out}38%{transform:translateY(-5px)}41%{transform:translateY(0);filter:brightness(1)}60%{filter:brightness(1)}68%{filter:brightness(1.35)}76%,100%{opacity:1;transform:translateY(0);filter:brightness(1)}}
+@media (prefers-reduced-motion:reduce){.fin-l,.fin-r,.visor,.gem{animation:none}}
+@media (max-width:560px){nav a{margin-left:14px}.hero{padding:36px 0 48px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="#"><img src="legix-mark.svg" alt="">LEGIX</a>
+    <nav><a href="#features">Features</a><a href="#install">Install</a><a href="https://github.com/shad0wcrawl3r/legix">GitHub</a></nav>
+  </header>
+
+  <div class="hero">
+    <svg viewBox="0 0 200 200" role="img" aria-label="The Legix logo assembling: L-shaped fins, a red visor and an ember gem">
+      <g class="part fin-l"><polygon points="6,62 18,62 66,156 54,156" fill="#B8321F"/><polygon points="59,142 80,142 74,156 54,156" fill="#B8321F"/></g>
+      <g class="part fin-r"><polygon points="194,62 182,62 134,156 146,156" fill="#B8321F"/><polygon points="141,142 120,142 126,156 146,156" fill="#B8321F"/></g>
+      <g class="part visor"><polygon points="30,24 44,24 100,140 100,170" fill="#E5432D"/><polygon points="170,24 156,24 100,140 100,170" fill="#E5432D"/></g>
+      <g class="part gem"><polygon points="100,44 80,58 85,86 100,98" fill="#FF6A3D"/><polygon points="100,44 120,58 115,86 100,98" fill="#FF9A55"/></g>
+    </svg>
+    <div class="word">LEGIX</div>
+    <p class="tag">A Bazzite-based OS for the original Lenovo Legion Go. Steam's Gaming Mode in your hands; a fast tiling desktop at your desk.</p>
+    <div class="cta">
+      <a class="btn primary" href="#install">Install</a>
+      <a class="btn" href="https://github.com/shad0wcrawl3r/legix">Source on GitHub</a>
+    </div>
+  </div>
+
+  <section id="features">
+    <h2>What you get</h2>
+    <div class="grid">
+      <div class="card"><h3>Gaming Mode, unchanged</h3><p>Steam's Gaming Mode works exactly as on Bazzite, with its controller, power and performance tuning for the Legion Go.</p></div>
+      <div class="card"><h3>A tiling desktop</h3><p>Switch to Desktop opens <a href="https://github.com/YaLTeR/niri">niri</a>, a scrolling tiling compositor, with the <a href="https://noctalia.dev">Noctalia</a> shell. Win+Space opens the app launcher.</p></div>
+      <div class="card"><h3>Made for no keyboard</h3><p>Noctalia's lock screen has an on-screen keyboard, so you can lock and unlock by touch. There's one on the desktop bar too.</p></div>
+      <div class="card"><h3>Lean</h3><p>No GNOME desktop, no Homebrew, no Waydroid, and only a handful of preinstalled apps. Zen is the browser.</p></div>
+      <div class="card"><h3>Signed and verified</h3><p>Every image is signed, and the device checks the signature before installing an update.</p></div>
+      <div class="card"><h3>Always current</h3><p>Rebuilt every day on top of Bazzite, so Bazzite and Fedora fixes arrive through Legix. Updates install from Steam's Settings.</p></div>
+    </div>
+  </section>
+
+  <section id="install">
+    <h2>Install</h2>
+    <ol class="steps">
+      <li><strong>Install Bazzite</strong> for handhelds, the <em>Deck, GNOME</em> edition, from <a href="https://bazzite.gg">bazzite.gg</a>.<p>Legix needs that edition as its starting point. Other editions use a different security policy, and the switch fails.</p></li>
+      <li><strong>Switch to Legix</strong> from a terminal, then restart:<pre><code>sudo bootc switch ghcr.io/shad0wcrawl3r/legix:latest
+systemctl reboot</code></pre></li>
+      <li><strong>Turn on signature checking</strong>, once, then restart again:<pre><code>sudo bootc switch --enforce-container-sigpolicy ghcr.io/shad0wcrawl3r/legix:latest
+systemctl reboot</code></pre></li>
+      <li><strong>Set Steam's PIN</strong> in Gaming Mode under Settings → Security, so Gaming Mode is locked too.</li>
+    </ol>
+    <p class="note">Your files and Bazzite itself stay one step away: pick the previous entry in the boot menu, or run <code>sudo bootc rollback</code>. The <a href="https://github.com/shad0wcrawl3r/legix#readme">README</a> has the full guide.</p>
+  </section>
+
+  <footer>
+    <p>Legix is based on <a href="https://bazzite.gg">Bazzite</a> and built with <a href="https://universal-blue.org">Universal Blue</a>. Licensed under Apache 2.0.</p>
+    <p>Legix is an independent project, not affiliated with or endorsed by Lenovo, Valve or the Bazzite project. "Legion Go" is a trademark of Lenovo, used only to name the hardware Legix supports.</p>
+  </footer>
+</div>
+</body>
+</html>

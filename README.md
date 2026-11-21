@@ -2,7 +2,7 @@
 
 <p align="center"><img src="branding/legix-mark.svg" width="140" alt="Legix logo: a red visor with L-shaped fins and an ember gem"></p>
 
-*Formerly LegionForge.*
+*Formerly LegionForge.* Website: [legix.shadowcrawler.dev](https://legix.shadowcrawler.dev)
 
 Legix is a custom [Bazzite](https://bazzite.gg) image for handheld gaming PCs. It is built
 for the original **Lenovo Legion Go** (Z1 Extreme). Gaming Mode is the same as stock Bazzite.
