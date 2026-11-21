@@ -101,7 +101,9 @@ echo "== Legix branding"
 check "os-release says Legix (ID stays bazzite for Bazzite's tools) with the Legix logo icon" \
   "grep -qx 'NAME=\"Legix\"' /usr/lib/os-release && grep -qx 'PRETTY_NAME=\"Legix\"' /usr/lib/os-release && grep -qx 'ID=bazzite' /usr/lib/os-release && grep -qx 'LOGO=legix-logo' /usr/lib/os-release && test -s /usr/share/icons/hicolor/scalable/apps/legix-logo.svg && test -s /usr/share/icons/hicolor/256x256/apps/legix-logo.png"
 check "image-info, fastfetch logo and welcome banner are Legix" \
-  "jq -e '.\"image-name\" == \"legix\" and (.\"image-ref\" | endswith(\"ghcr.io/shad0wcrawl3r/legix\"))' /usr/share/ublue-os/image-info.json && grep -q '38;2;229;67;45' /usr/share/ublue-os/bazzite/fastfetch.jsonc && cmp -s /usr/share/ublue-os/bazzite/logo.svg /usr/share/icons/hicolor/scalable/apps/legix-logo.svg && grep -q '^# .*Legix' /usr/share/ublue-os/motd/template.md && grep -q '^Legix' /etc/system-release"
+  "jq -e '(.\"image-ref\" | endswith(\"ghcr.io/shad0wcrawl3r/legix\"))' /usr/share/ublue-os/image-info.json && grep -q '38;2;229;67;45' /usr/share/ublue-os/bazzite/fastfetch.jsonc && cmp -s /usr/share/ublue-os/bazzite/logo.svg /usr/share/icons/hicolor/scalable/apps/legix-logo.svg && grep -q '^# .*Legix' /usr/share/ublue-os/motd/template.md && grep -q '^Legix' /etc/system-release"
+check "image-info keeps Bazzite's image-name/vendor (Deck autologin and handheld setup match on 'deck')" \
+  "jq -e '(.\"image-name\" | test(\"deck\")) and .\"image-vendor\" == \"ublue-os\"' /usr/share/ublue-os/image-info.json"
 check "no Bazzite name left in os-release display fields" \
   "! grep -E '^(NAME|PRETTY_NAME|BOOTLOADER_NAME|DEFAULT_HOSTNAME|LOGO)=' /usr/lib/os-release | grep -qi bazzite"
 check "pre-rename paths still work (away script link, seeder removes the old defaults file)" \
