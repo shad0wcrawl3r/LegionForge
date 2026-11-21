@@ -286,4 +286,21 @@ for t in /usr/share/ublue-os/motd/template*.md; do
   sed -i -E 's#\[(Documentation|Dokumentation)\]\(https://docs.bazzite.gg/\)#[\1 (Bazzite, the base)](https://docs.bazzite.gg/)#' "$t"
   grep -q '^# .*Legix' "$t"
 done
+# Steam Gaming Mode startup and suspend videos: Legix's, rendered in the
+# branding-assets stage (same choreography as the boot animation). Bazzite's
+# steam-tweaks copies these into each user's Steam overrides. Record the
+# originals' checksums so legix-steam-videos can replace copies users already
+# have, and nothing else.
+md5sum "$bz"/bazzite.webm "$bz"/bazzite-oled.webm "$bz"/bazzite-suspend.webm "$bz"/bazzite-suspend-oled.webm \
+  | cut -d' ' -f1 | sort -u > /usr/share/legix/bazzite-video-md5sums
+test "$(wc -l < /usr/share/legix/bazzite-video-md5sums)" -ge 2
+install -m0644 /ctx/branding-video/legix.webm "$bz/bazzite.webm"
+install -m0644 /ctx/branding-video/legix.webm "$bz/bazzite-oled.webm"
+install -m0644 /ctx/branding-video/legix-suspend.webm "$bz/bazzite-suspend.webm"
+install -m0644 /ctx/branding-video/legix-suspend.webm "$bz/bazzite-suspend-oled.webm"
+chmod 0755 /usr/libexec/legix-steam-videos
+systemctl --global enable legix-steam-videos.service
+# Launcher: Bazzite's updater updates Legix, so give it Legix's name.
+sed -i 's/^Name=Bazzite Updater$/Name=Legix Updater/' /usr/share/applications/io.github.rfrench3.bazzite-updater.desktop
+grep -qx 'Name=Legix Updater' /usr/share/applications/io.github.rfrench3.bazzite-updater.desktop
 

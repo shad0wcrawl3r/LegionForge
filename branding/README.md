@@ -12,5 +12,7 @@
 Palette: Forge Red `#E5432D`, fins `#B8321F`, Ember `#FF6A3D` / `#FF9A55`, Ash `#0B0C0E`,
 Steel `#ECEEF1`. Design canvas: https://claude.ai/artifact/QnhNk1iYRTaemyE6tRh2LG
 
+`ChakraPetch-Bold.ttf` is used to draw the wordmark in the Steam videos.
+
 Chakra Petch is licensed under the SIL Open Font License 1.1 (`plymouth/ChakraPetch-OFL.txt`).
 Legix is not affiliated with or endorsed by Lenovo.

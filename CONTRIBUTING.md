@@ -98,6 +98,9 @@ places Bazzite's own tools rely on. `build.sh` (*Legix branding*) does this:
   Bazzite's `logo.svg`, `logo.txt` (fastfetch) and `updatelogo.png` are swapped for Legix's.
 - **Terminal:** fastfetch colours, and the welcome banner.
 - **Boot animation:** the Plymouth theme.
+- **Steam videos:** Gaming Mode's startup and suspend videos, rendered by
+  `build_files/branding/render-videos.py`. `legix-steam-videos` replaces users' existing Bazzite copies, and only those.
+- **Launcher:** "Bazzite Updater" is renamed "Legix Updater".
 
 Links to Bazzite's docs and community are kept and labelled as Legix's base. The smoke
 test checks all of the above.

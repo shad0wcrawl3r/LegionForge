@@ -1,0 +1,10 @@
+[Unit]
+Description=Legix: replace Bazzite's Steam startup and suspend videos with Legix's
+Documentation=https://github.com/shad0wcrawl3r/legix
+
+[Service]
+Type=oneshot
+ExecStart=/usr/libexec/legix-steam-videos
+
+[Install]
+WantedBy=default.target
