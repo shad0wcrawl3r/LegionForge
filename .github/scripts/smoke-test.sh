@@ -66,11 +66,11 @@ check "Noctalia lock screen has the on-screen keyboard (lockscreen.keyboard sett
 
 echo "== GNOME removed, niri essentials kept"
 check "GNOME desktop removed (gdm gnome-shell gnome-session gnome-control-center)" \
-  "for p in gdm gnome-shell gnome-session gnome-control-center; do ! rpm -q \$p; done && test ! -e /usr/share/wayland-sessions/gnome.desktop"
+  "! rpm -q gdm gnome-shell gnome-session gnome-control-center | grep -qv 'is not installed' && test ! -e /usr/share/wayland-sessions/gnome.desktop"
 check "kept: sddm, oo7 password store + PAM unlock, portals, nautilus, VPN dialogs, pinentry, GTK3 theme" \
   "rpm -q sddm oo7-daemon oo7-portal pam_oo7 xdg-desktop-portal-gnome xdg-desktop-portal-gtk nautilus gnome-disk-utility NetworkManager-openvpn-gnome NetworkManager-openconnect-gnome pinentry-gnome3 adw-gtk3-theme"
 check "unused GNOME pieces removed (mutter, gnome-settings-daemon, evolution-data-server, docs)" \
-  "for p in mutter gnome-settings-daemon evolution-data-server gnome-user-docs gnome-backgrounds gjs; do ! rpm -q \$p; done"
+  "! rpm -q mutter gnome-settings-daemon evolution-data-server gnome-user-docs gnome-backgrounds gjs | grep -qv 'is not installed'"
 check "no leftover GNOME Shell extensions" \
   "test ! -e /usr/share/gnome-shell/extensions"
 check "ujust parses and has the Legix recipes" \
@@ -96,6 +96,16 @@ fi
 
 check "pre-rename name ghcr.io/shad0wcrawl3r/legionforge still trusted (same key) during the move" \
   "jq -e '.transports.docker[\"ghcr.io/shad0wcrawl3r/legionforge\"][0] | .type == \"sigstoreSigned\" and .keyPath == \"/etc/pki/containers/legix.pub\"' /etc/containers/policy.json && grep -q 'ghcr.io/shad0wcrawl3r/legionforge:' /etc/containers/registries.d/legix.yaml"
+
+echo "== Lean desktop"
+check "removed: Waydroid/LXC, Web Apps, Rygel, Help; no stray Bazzite launcher entries" \
+  "! rpm -q waydroid lxc webapp-manager rygel yelp | grep -qv 'is not installed' && ! ls /usr/share/applications/{discourse,bazzite-documentation,waydroid-container-restart,bbrew,Waydroid,webapp-manager}.desktop 2>/dev/null | grep -q . && grep -qx NoDisplay=true /usr/share/applications/yad-icon-browser.desktop"
+check "Homebrew not set up by default (masked, no tarball, no profile hook)" \
+  "test \"\$(readlink /etc/systemd/system/brew-setup.service)\" = /dev/null && test ! -e /usr/share/homebrew.tar.zst && test ! -e /etc/profile.d/brew.sh"
+check "Flatpak trim + Zen setup enabled" \
+  "test -x /usr/libexec/legix-flatpak-setup && bash -n /usr/libexec/legix-flatpak-setup && test -L /etc/systemd/system/multi-user.target.wants/legix-flatpak-setup.service && grep -q app.zen_browser.zen /usr/libexec/legix-flatpak-setup"
+check "niri default config: Noctalia launcher on Mod+Space, Ptyxis terminal, valid" \
+  "niri validate -c /etc/niri/config.kdl && grep -q 'Mod+Space .*panel-toggle\" \"launcher' /etc/niri/config.kdl && grep -q 'Mod+T .*ptyxis' /etc/niri/config.kdl && ! grep -q 'spawn-at-startup \"waybar\"' /etc/niri/config.kdl"
 
 echo "== Legix branding"
 check "os-release says Legix (ID stays bazzite for Bazzite's tools) with the Legix logo icon" \
