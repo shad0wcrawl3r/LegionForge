@@ -4,7 +4,10 @@
 FROM registry.fedoraproject.org/fedora:45 AS branding-assets
 COPY branding /branding
 COPY build_files/plymouth/render.sh /render.sh
-RUN --mount=type=cache,dst=/var/cache/libdnf5 dnf5 -y install librsvg2-tools && /render.sh /branding /out
+COPY build_files/branding/render-videos.py /render-videos.py
+RUN --mount=type=cache,dst=/var/cache/libdnf5 dnf5 -y install librsvg2-tools ffmpeg-free python3-pillow \
+ && /render.sh /branding /out \
+ && mkdir -p /out/videos && python3 -I /render-videos.py /branding/ChakraPetch-Bold.ttf /out/videos
 
 # Allow build scripts to be referenced without being copied into the final image
 FROM scratch AS ctx
@@ -17,6 +20,7 @@ COPY cosign.pub /cosign.pub
 COPY noctalia-rpms /noctalia-rpms
 COPY --from=branding-assets /out/plymouth /plymouth
 COPY --from=branding-assets /out/icons /branding-png/icons
+COPY --from=branding-assets /out/videos /branding-video
 COPY branding /branding
 
 # Base Image
